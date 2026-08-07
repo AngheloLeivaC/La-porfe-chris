@@ -1,0 +1,49 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <img [src]="content.images.logoFooter" alt="Logo La Profe Chris" class="footer-logo" />
+      <p class="footer-tagline">
+        Transformando el aprendizaje de idiomas con pasión y metodología experta.
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Explorar</h4>
+      <nav class="footer-links">
+        <a *ngFor="let l of content.navLinks" [href]="'#' + l.id">{{ l.label }}</a>
+      </nav>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Contacto</h4>
+      <div class="footer-links">
+        <div class="footer-contact-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M22 6l-10 7L2 6" />
+          </svg>
+          info&#64;laprofechris.com
+        </div>
+        <div class="footer-contact-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z" />
+          </svg>
+          www.laprofechris.com
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Legal</h4>
+      <nav class="footer-links">
+        <a *ngFor="let l of legalLinks" href="#">{{ l }}</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© {{ year }} La Profe Chris. Todos los derechos reservados.</p>
+  </div>
+</footer>

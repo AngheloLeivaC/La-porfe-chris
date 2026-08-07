@@ -1,0 +1,54 @@
+<header class="header" [class.scrolled]="scrolled">
+  <div class="header-inner">
+    <div class="header-brand">
+      <img [src]="content.images.logo" alt="Logo La Profe Chris" class="header-logo" />
+    </div>
+
+    <nav class="header-nav hide-mobile">
+      <a
+        *ngFor="let link of content.navLinks; let i = index"
+        [href]="'#' + link.id"
+        [class.active]="i === 0"
+      >
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="#inscripcion" class="btn btn-primary hide-mobile">Iniciar Inscripción</a>
+      <div class="header-avatar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"
+            fill="#fff"
+          />
+        </svg>
+      </div>
+      <button
+        class="header-menu-btn show-mobile"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-label]="menuOpen ? 'Cerrar menú' : 'Abrir menú'"
+        [attr.aria-expanded]="menuOpen"
+        aria-controls="header-mobile-menu"
+      >
+        <svg *ngIf="!menuOpen" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <svg *ngIf="menuOpen" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="header-mobile-menu show-mobile" id="header-mobile-menu" *ngIf="menuOpen">
+    <a *ngFor="let link of content.navLinks" [href]="'#' + link.id" (click)="closeMenu()">
+      {{ link.label }}
+    </a>
+    <a href="#inscripcion" class="btn btn-primary" (click)="closeMenu()">Iniciar Inscripción</a>
+  </div>
+</header>

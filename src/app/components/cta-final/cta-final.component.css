@@ -1,0 +1,217 @@
+.cta-section {
+  padding: var(--section-gap) 0;
+}
+.cta-box {
+  position: relative;
+  border-radius: 40px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-academic-blue));
+  overflow: hidden;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  padding: 40px 24px;
+}
+@media (min-width: 901px) {
+  .cta-box {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 64px;
+  }
+}
+.cta-decor {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.cta-info {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.2vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+.cta-subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.85;
+  max-width: 460px;
+  margin: 0;
+}
+.cta-contact-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cta-contact-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cta-contact-list a {
+  color: #fff;
+}
+.cta-contact-list a:hover {
+  text-decoration: underline;
+}
+.cta-contact-sep {
+  opacity: 0.5;
+  margin: 0 2px;
+}
+.cta-contact-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-form-card {
+  position: relative;
+  z-index: 10;
+  background: #fff;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.35);
+  color: var(--color-on-surface);
+}
+.cta-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 560px) {
+  .cta-form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.cta-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.cta-form-row .cta-form-field {
+  margin-bottom: 0;
+}
+.cta-form-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.cta-form-field input,
+.cta-form-field select,
+.cta-form-field textarea {
+  border: 1px solid rgba(192, 198, 214, 0.4);
+  background: var(--color-surface-container-low);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-on-surface);
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cta-form-field input::placeholder,
+.cta-form-field textarea::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 0.6;
+}
+.cta-form-field input:focus,
+.cta-form-field select:focus,
+.cta-form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 91, 178, 0.15);
+}
+.cta-form-field input.invalid {
+  border-color: var(--color-error, #ba1a1a);
+}
+.cta-form-error {
+  font-size: 12px;
+  color: var(--color-error, #ba1a1a);
+}
+.cta-form-hint-inline {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.cta-form-submit {
+  width: 100%;
+  background: var(--color-tertiary);
+  color: #fff;
+  border: none;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 24px -8px rgba(153, 65, 0, 0.5);
+}
+.cta-form-submit:hover {
+  transform: translateY(-2px);
+}
+.cta-form-hint {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+  margin: 10px 0 0;
+}
+
+.cta-form-success {
+  text-align: center;
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.cta-form-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #2e7d32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.cta-form-success h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+.cta-form-success p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  max-width: 320px;
+}
+.cta-form-reset {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}

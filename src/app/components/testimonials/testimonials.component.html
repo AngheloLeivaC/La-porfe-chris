@@ -1,0 +1,36 @@
+<section class="testimonials">
+  <div class="container testimonials-header" appScrollReveal>
+    <h2 class="testimonials-title">Lo que dicen mis alumnos</h2>
+    <p class="testimonials-subtitle">
+      Experiencias reales de personas que transformaron su vida aprendiendo francés.
+    </p>
+  </div>
+
+  <div class="container testimonials-grid">
+    <div class="testimonial-card" *ngFor="let t of content.testimonials; let i = index" appScrollReveal
+      [revealDelay]="i * 120">
+      <svg class="testimonial-quote-icon" width="56" height="56" viewBox="0 0 24 24" fill="rgba(0,91,178,0.2)">
+        <path
+          d="M9.5 8.5c-2.2 0-4 1.8-4 4v3h4v-3h-2c0-1.1.9-2 2-2V8.5zm9 0c-2.2 0-4 1.8-4 4v3h4v-3h-2c0-1.1.9-2 2-2V8.5z" />
+      </svg>
+      <div class="testimonial-stars">
+        <svg *ngFor="let s of stars" width="16" height="16" viewBox="0 0 24 24" fill="var(--color-tertiary)">
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      </div>
+      <p class="testimonial-text">&ldquo;{{ t.text }}&rdquo;</p>
+      <div class="testimonial-author">
+        <img *ngIf="t.photo; else avatarPlaceholder" [src]="t.photo" [alt]="'Foto de ' + t.name"
+          class="testimonial-avatar" />
+        <ng-template #avatarPlaceholder>
+          <div class="testimonial-avatar"></div>
+        </ng-template>
+        <div>
+          <p class="testimonial-name">{{ t.name }}</p>
+          <p class="testimonial-role">{{ t.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

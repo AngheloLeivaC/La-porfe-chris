@@ -1,0 +1,207 @@
+.courses {
+  padding: var(--section-gap) 0;
+}
+.courses-lang-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+.courses-eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin: 0;
+}
+.courses-lang-tabs {
+  display: inline-flex;
+  gap: 12px;
+}
+.courses-lang-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.courses-lang-flag {
+  font-size: 15px;
+  line-height: 1;
+}
+.courses-lang-tab:hover {
+  color: var(--color-primary);
+  border-color: rgba(0, 91, 178, 0.35);
+  box-shadow: 0 1px 4px rgba(0, 91, 178, 0.15);
+}
+.courses-lang-tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.courses-lang-tab.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 91, 178, 0.15);
+}
+@media (max-width: 480px) {
+  .courses-lang-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .courses-lang-tab {
+    padding: 9px 18px;
+    font-size: 13px;
+  }
+}
+.courses-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 64px;
+}
+.courses-empty {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  background: var(--color-surface-container-low);
+  border-radius: 24px;
+  font-size: 16px;
+}
+.courses-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  max-width: 640px;
+}
+.courses-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.courses-link:hover {
+  text-decoration: underline;
+}
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--gutter);
+}
+.course-card {
+  background: var(--color-surface);
+  border-radius: 32px;
+  overflow: hidden;
+  border: 1px solid rgba(192, 198, 214, 0.1);
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+.course-card:hover {
+  box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-6px);
+}
+.course-image-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+.course-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+.course-card:hover .course-image {
+  transform: scale(1.08);
+}
+.course-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+.course-body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.course-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.course-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+.course-price {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.course-text {
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  line-height: 1.5;
+}
+.course-divider {
+  border: none;
+  border-top: 1px solid rgba(192, 198, 214, 0.1);
+  margin: 0;
+}
+.course-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+.course-weeks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.btn-small {
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(0, 91, 178, 0.05);
+  color: var(--color-primary);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.btn-small:hover {
+  background: var(--color-primary);
+  color: #fff;
+}

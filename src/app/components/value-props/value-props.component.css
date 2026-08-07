@@ -1,0 +1,40 @@
+.value-props {
+  padding: var(--section-gap) 0;
+  background: var(--color-surface-container-low);
+}
+.value-props-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--gutter);
+}
+.value-card {
+  padding: 32px;
+  background: var(--color-surface);
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.value-card:hover {
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px);
+}
+.value-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.value-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.value-text {
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+  margin: 0;
+}

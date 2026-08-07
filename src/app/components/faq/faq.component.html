@@ -1,0 +1,43 @@
+<section class="faq">
+  <div class="faq-container" appScrollReveal>
+    <h2 class="faq-title">Preguntas Frecuentes</h2>
+    <div class="faq-list">
+      <div class="faq-item" *ngFor="let f of content.faqs; let i = index">
+        <h3>
+          <button
+            class="faq-button"
+            type="button"
+            [id]="'faq-button-' + i"
+            [attr.aria-expanded]="openIndex === i"
+            [attr.aria-controls]="'faq-answer-' + i"
+            (click)="toggle(i)"
+          >
+            <span class="faq-question">{{ f.q }}</span>
+            <svg
+              class="faq-icon"
+              [class.open]="openIndex === i"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+        </h3>
+        <div
+          class="faq-answer"
+          *ngIf="openIndex === i"
+          [id]="'faq-answer-' + i"
+          role="region"
+          [attr.aria-labelledby]="'faq-button-' + i"
+        >
+          {{ f.a }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,72 @@
+<section id="sobre-mi" class="about">
+  <div class="container about-grid">
+    <div class="about-content" appScrollReveal>
+      <p class="about-eyebrow">Enchantée ! Soy Chris</p>
+      <h2 class="about-title">Mi pasión es abrirte las puertas del mundo francófono</h2>
+      <div class="about-text-block">
+        <p>
+          Desde que tuve mi primer contacto con el francés, supe que no era solo un idioma,
+          sino una forma de ver la vida. Mi misión es que dejes de ver el francés como una
+          asignatura difícil y empieces a vivirlo como una herramienta de libertad.
+        </p>
+        <p>
+          He ayudado a cientos de profesionales, estudiantes y viajeros a perder el miedo a
+          hablar. No te enseñaré solo gramática; te enseñaré la cultura, los modismos y la
+          confianza necesaria para que te sientas un local en cualquier parte de Francia.
+        </p>
+      </div>
+      <div class="about-audio-row">
+        <button
+          type="button"
+          class="about-play-btn"
+          (click)="playIntroStory()"
+          [attr.aria-label]="isMuted ? 'Reproducir video con sonido: escucha mi historia' : 'Silenciar el video'"
+        >
+          <svg *ngIf="isMuted" width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+            <polygon points="6 3 20 12 6 21 6 3" />
+          </svg>
+          <svg *ngIf="!isMuted" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true">
+            <rect x="6" y="5" width="4" height="14" />
+            <rect x="14" y="5" width="4" height="14" />
+          </svg>
+        </button>
+        <div>
+          <p class="about-audio-label">Escucha mi historia</p>
+          <p class="about-audio-sub">Directo desde París</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-image-wrap" appScrollReveal [revealDelay]="150">
+      <div class="about-image-decor a"></div>
+      <div class="about-image-decor b"></div>
+      <div class="about-image-frame">
+        <video
+          #introVideo
+          class="about-video"
+          src="assets/videos/chris-intro.mp4"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
+        <button class="about-video-mute-btn" (click)="toggleSound()" [attr.aria-label]="isMuted ? 'Activar sonido' : 'Silenciar'">
+          <svg *ngIf="isMuted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+          <svg *ngIf="!isMuted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M18 6a9 9 0 0 1 0 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="about-stat-badge hide-mobile">
+        <p class="about-stat-number">10+</p>
+        <p class="about-stat-label">Años de experiencia</p>
+      </div>
+    </div>
+  </div>
+</section>
