@@ -191,6 +191,7 @@
   color: var(--color-on-surface-variant);
 }
 .btn-small {
+  display: inline-block;
   padding: 10px 24px;
   border-radius: 12px;
   font-size: 14px;
@@ -199,6 +200,7 @@
   color: var(--color-primary);
   border: none;
   cursor: pointer;
+  text-decoration: none;
   transition: background 0.2s ease, color 0.2s ease;
 }
 .btn-small:hover {

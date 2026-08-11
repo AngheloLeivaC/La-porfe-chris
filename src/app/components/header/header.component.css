@@ -90,6 +90,9 @@
   font-weight: 600;
   color: var(--color-on-surface);
 }
+.header-mobile-menu a.active {
+  color: var(--color-primary);
+}
 .header-mobile-menu .btn-primary {
   display: block;
   text-align: center;

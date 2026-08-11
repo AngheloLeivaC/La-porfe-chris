@@ -1,0 +1,171 @@
+<section class="course-detail-section">
+  <div class="container">
+    <a [routerLink]="['/']" fragment="cursos" class="course-detail-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+      Volver a todos los cursos
+    </a>
+
+    <ng-container *ngIf="course; else notFoundBlock">
+      <div class="course-detail-layout">
+
+        <!-- Columna izquierda: selector de nivel, video, certificado, tarjeta de compra -->
+        <aside class="course-sidebar">
+          <div class="course-sidebar-sticky">
+
+            <div class="level-select-wrap" *ngIf="siblingCourses.length > 1">
+              <span class="level-select-label">Explorar niveles</span>
+              <select class="level-select" [value]="course.slug" (change)="onLevelChange($any($event.target).value)">
+                <option *ngFor="let c of siblingCourses" [value]="c.slug">
+                  Nivel {{ c.level }}
+                </option>
+              </select>
+            </div>
+
+            <div class="course-video-wrap">
+              <video #previewVideo *ngIf="course.video; else videoFallback" [src]="course.video" [poster]="course.img"
+                playsinline (click)="toggleVideo()" (ended)="videoPlaying = false"></video>
+              <ng-template #videoFallback>
+                <img [src]="course.img" [alt]="course.title" class="course-video-fallback-img" />
+              </ng-template>
+              <button *ngIf="course.video" type="button" class="course-video-play" (click)="toggleVideo()"
+                [attr.aria-label]="videoPlaying ? 'Pausar video' : 'Reproducir video'">
+                <svg *ngIf="!videoPlaying" width="22" height="22" viewBox="0 0 24 24" fill="#fff">
+                  <polygon points="6 3 20 12 6 21 6 3" />
+                </svg>
+                <svg *ngIf="videoPlaying" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                  stroke-width="2">
+                  <rect x="6" y="5" width="4" height="14" />
+                  <rect x="14" y="5" width="4" height="14" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="course-certificate" *ngIf="course.certificateText">
+              <span class="course-certificate-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2 15 8 22 9 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9 9 8 12 2z" />
+                </svg>
+              </span>
+              <div>
+                <p class="course-certificate-title">Certificado Incluido</p>
+                <p class="course-certificate-text">{{ course.certificateText }}</p>
+              </div>
+            </div>
+
+            <div class="course-buy-card">
+              <p class="course-buy-heading">Tu pasaporte al mundo</p>
+
+              <ul class="course-includes" *ngIf="course.includes?.length">
+                <li *ngFor="let item of course.includes">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="8 12 11 15 16 9" />
+                  </svg>
+                  {{ item }}
+                </li>
+              </ul>
+
+              <div class="course-buy-price-row">
+                <span class="course-buy-price">{{ course.price }}</span>
+                <span class="course-buy-price-note">Pago único</span>
+              </div>
+
+              <button type="button" class="course-buy-btn" (click)="openEnrollmentModal()">
+                Inscribirme ahora
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Columna derecha: encabezado del curso + temario expandible -->
+        <div class="course-main">
+          <p class="course-detail-eyebrow">
+            <span class="course-detail-eyebrow-dot" [style.background]="course.badgeColor"></span>
+            Curso de {{ languageLabel }}
+          </p>
+          <h1 class="course-detail-title">{{ course.title }}</h1>
+          <p class="course-detail-text">{{ course.text }}</p>
+
+          <div class="course-detail-meta">
+            <div class="course-detail-chip">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 16 14" />
+              </svg>
+              {{ course.weeks }}
+            </div>
+            <div class="course-detail-chip">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5zM6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" />
+              </svg>
+              Nivel {{ course.level }}
+            </div>
+          </div>
+
+          <div class="course-modules" *ngIf="course.modules?.length">
+            <div class="module-card" *ngFor="let m of course.modules; let i = index">
+              <button type="button" class="module-header" (click)="toggleModule(i)"
+                [attr.aria-expanded]="openModuleIndex === i" [attr.aria-controls]="'module-body-' + i">
+                <div>
+                  <p class="module-label">Módulo {{ i + 1 }}</p>
+                  <h3 class="module-title">{{ m.title }}</h3>
+                </div>
+                <span class="module-toggle-icon" [class.open]="openModuleIndex === i">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </span>
+              </button>
+              <div class="module-body" [id]="'module-body-' + i" *ngIf="openModuleIndex === i">
+                <ul class="module-lessons" *ngIf="m.lessons?.length; else moduleDescription">
+                  <li *ngFor="let lesson of m.lessons; let li = index">
+                    <svg *ngIf="i === 0 && li === 0" width="15" height="15" viewBox="0 0 24 24"
+                      fill="var(--color-tertiary)" class="lesson-icon-play">
+                      <polygon points="6 3 20 12 6 21 6 3" />
+                    </svg>
+                    <svg *ngIf="!(i === 0 && li === 0)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" class="lesson-icon-lock">
+                      <rect x="4" y="10" width="16" height="10" rx="2" />
+                      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                    </svg>
+                    <span [class.lesson-text-active]="i === 0 && li === 0">{{ lesson }}</span>
+                  </li>
+                </ul>
+                <ng-template #moduleDescription>
+                  <p>{{ m.description }}</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div class="course-detail-actions" *ngIf="!course.modules?.length">
+            <button type="button" class="btn btn-primary" (click)="openEnrollmentModal()">
+              Inscribirme por WhatsApp
+            </button>
+            <a [routerLink]="['/']" fragment="inscripcion" class="btn btn-secondary">
+              Ir al formulario de inscripción
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <ng-template #notFoundBlock>
+      <div class="course-detail-not-found">
+        <h1>No encontramos este curso</h1>
+        <p>Puede que el enlace esté mal escrito o que el curso ya no esté disponible.</p>
+        <a [routerLink]="['/']" fragment="cursos" class="btn btn-primary">Ver todos los cursos</a>
+      </div>
+    </ng-template>
+  </div>
+  <app-enrollment-modal *ngIf="showEnrollmentModal && course" [courseTitle]="course.title"
+    (closed)="closeEnrollmentModal()"></app-enrollment-modal>
+</section>

@@ -10,7 +10,7 @@
     <div class="footer-col">
       <h4 class="footer-heading">Explorar</h4>
       <nav class="footer-links">
-        <a *ngFor="let l of content.navLinks" [href]="'#' + l.id">{{ l.label }}</a>
+        <a *ngFor="let l of content.navLinks" [routerLink]="['/']" [fragment]="l.id">{{ l.label }}</a>
       </nav>
     </div>
 

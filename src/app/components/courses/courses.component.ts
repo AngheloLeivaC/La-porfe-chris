@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ContentService } from '../../core/content.service';
 import { ScrollRevealDirective } from '../../shared/scroll-reveal.directive';
 import { CourseLanguage } from '../../core/models';
@@ -7,7 +8,7 @@ import { CourseLanguage } from '../../core/models';
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, ScrollRevealDirective],
+  imports: [CommonModule, RouterLink, ScrollRevealDirective],
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.css',
 })

@@ -5,6 +5,7 @@ import {
   AfterViewChecked,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ContentService } from '../../core/content.service';
 import { ChatOption } from '../../core/models';
 
@@ -32,7 +33,7 @@ export class ChatbotComponent implements AfterViewChecked {
   private currentStepId = 'inicio';
   private shouldScroll = false;
 
-  constructor(public content: ContentService) {
+  constructor(public content: ContentService, private router: Router) {
     this.loadStep(this.currentStepId, false);
   }
 
@@ -141,11 +142,13 @@ export class ChatbotComponent implements AfterViewChecked {
     this.shouldScroll = true;
   }
 
-  private scrollToSection(id: string): void {
+ private scrollToSection(id: string): void {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
     }
+    this.router.navigate(['/'], { fragment: id });
   }
 
   private scrollToBottom(): void {

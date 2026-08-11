@@ -55,7 +55,7 @@
               </svg>
               {{ c.weeks }}
             </div>
-            <button class="btn-small">Más Info</button>
+            <a [routerLink]="['/curso', c.language, c.slug]" class="btn-small">Más Info</a>
           </div>
         </div>
       </div>
