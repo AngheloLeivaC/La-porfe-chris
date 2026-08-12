@@ -1,0 +1,110 @@
+.promo-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(20, 25, 35, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: lpc-fade-up 0.25s ease;
+}
+.promo-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(160deg, var(--color-primary), var(--color-academic-blue));
+  border-radius: 28px;
+  padding: 36px 32px 32px;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.5);
+}
+.promo-decor {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.promo-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+.promo-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.promo-badge {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 16px;
+}
+.promo-title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 12px;
+}
+.promo-subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0 0 24px;
+}
+.promo-cta {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: var(--color-tertiary);
+  color: #fff;
+  border: none;
+  padding: 15px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease;
+}
+.promo-cta:hover {
+  transform: translateY(-2px);
+}
+.promo-skip {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  margin-top: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}

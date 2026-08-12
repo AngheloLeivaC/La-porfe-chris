@@ -39,6 +39,14 @@ export class ContentService {
     { bank: 'BBVA', account: '0000-0000-0000000000', cci: '011-000-000000000000-00' },
   ];
 
+  readonly promoOffer = {
+    badge: '🎁 Oferta por tiempo limitado',
+    title: '¡Tu primera clase de francés es GRATIS!',
+    subtitle:
+      'Prueba nuestra metodología sin compromiso. Una Guia completa de la Profe Chris, sin costo y sin tarjeta.',
+    ctaLabel: 'Quiero mi guia gratis',
+  };
+
   constructor() {
     if (isDevMode() && this.whatsappNumber === ContentService.PLACEHOLDER_WHATSAPP) {
       // eslint-disable-next-line no-console

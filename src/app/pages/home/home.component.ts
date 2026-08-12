@@ -6,7 +6,7 @@ import { AboutMeComponent } from '../../components/about-me/about-me.component';
 import { TestimonialsComponent } from '../../components/testimonials/testimonials.component';
 import { FaqComponent } from '../../components/faq/faq.component';
 import { CtaFinalComponent } from '../../components/cta-final/cta-final.component';
-
+import { PromoModalComponent } from '../../shared/promo-modal/promo-modal.component';
 // Página de inicio: agrupa todas las secciones que antes vivían directo en
 // AppComponent. Al existir como su propia ruta ('/'), el router puede
 // mostrar otras páginas (como el detalle de un curso) sin duplicar el
@@ -23,6 +23,7 @@ import { CtaFinalComponent } from '../../components/cta-final/cta-final.componen
     TestimonialsComponent,
     FaqComponent,
     CtaFinalComponent,
+    PromoModalComponent,
   ],
   templateUrl: './home.component.html',
 })
