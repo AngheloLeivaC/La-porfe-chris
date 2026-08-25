@@ -22,7 +22,18 @@ export class CoursesComponent {
   }
 
   get filteredCourses() {
-    return this.content.courses.filter((c) => c.language === this.selectedLanguage);
+    return this.content
+      .courses()
+      .filter((c) => c.language === this.selectedLanguage)
+      .slice(0, 3);
+  }
+
+  get loading(): boolean {
+    return this.content.coursesLoading();
+  }
+
+  get loadError(): boolean {
+    return this.content.coursesError();
   }
 
   get sectionTitle(): string {

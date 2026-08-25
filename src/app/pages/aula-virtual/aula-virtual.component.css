@@ -1,0 +1,215 @@
+.aula-shell {
+  min-height: 100vh;
+  background: var(--color-surface);
+  font-family: var(--font-body);
+}
+
+/* ---------- Barra superior ---------- */
+.aula-topbar {
+  background: #0b1f3a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.aula-logo {
+  height: 28px;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.aula-stripe {
+  display: flex;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stripe-bleu { flex: 1; background: #0055a4; }
+.stripe-blanc { flex: 1; background: #ffffff; }
+.stripe-rouge { flex: 1; background: #ef4135; }
+
+.aula-user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aula-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.aula-user-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Layout: sidebar + contenido ---------- */
+.aula-body {
+  display: flex;
+  align-items: stretch;
+}
+
+.aula-main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px var(--margin-desktop, 40px) 80px;
+}
+
+.aula-title {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0 0 8px;
+}
+
+.aula-subtitle {
+  color: var(--color-on-surface-variant);
+  margin: 0 0 36px;
+}
+
+.aula-state {
+  background: var(--color-surface-container-low);
+  border-radius: 14px;
+  padding: 40px;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+}
+
+.aula-state--error {
+  color: #a02f2f;
+}
+
+.aula-explore-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ---------- Tarjetas de curso ---------- */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.course-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.course-thumb {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: var(--color-surface-container);
+}
+
+.course-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.status-active { background: #1a8f4c; }
+.status-blocked { background: #6c757d; }
+.status-expired { background: #d97706; }
+
+.course-body {
+  padding: 16px;
+}
+
+.course-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-on-surface);
+  margin: 0 0 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-btn {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 10px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.status-active-btn { background: #1a8f4c; }
+.status-expired-btn { background: #d97706; }
+.status-blocked-btn {
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+  .aula-main {
+    padding: 28px 20px 60px;
+  }
+}

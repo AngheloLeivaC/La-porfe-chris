@@ -1,0 +1,134 @@
+<div class="login-shell">
+
+  <!-- Panel de marca (oscuro, oculto en mobile) -->
+  <aside class="login-brand">
+    <div class="brand-content">
+      <a [routerLink]="['/']" class="brand-logo-link">
+        <img [src]="content.images.logo" alt="La Profe Chris" class="brand-logo" />
+      </a>
+
+      <div class="brand-stripe" aria-hidden="true">
+        <span class="stripe-bleu"></span>
+        <span class="stripe-blanc"></span>
+        <span class="stripe-rouge"></span>
+      </div>
+
+      <h1 class="brand-headline">Bienvenue<span class="brand-dot">.</span></h1>
+      <p class="brand-subtext">
+        Entra a tu aula virtual y continúa tu aventura con el francés,
+        el inglés o el español justo donde la dejaste.
+      </p>
+
+      <blockquote class="brand-quote">
+        “On ne parle pas une langue, on l'habite.”
+        <cite>— La Profe Chris</cite>
+      </blockquote>
+    </div>
+  </aside>
+
+  <!-- Panel del formulario -->
+  <main class="login-form-panel">
+    <div class="login-form-wrap">
+
+      <a [routerLink]="['/']" class="back-link">← Volver al inicio</a>
+
+      <div class="mode-toggle" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="mode-btn"
+          [class.mode-btn--active]="mode() === 'estudiante'"
+          (click)="setMode('estudiante')"
+        >
+          Estudiante
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="mode-btn"
+          [class.mode-btn--active]="mode() === 'administrador'"
+          (click)="setMode('administrador')"
+        >
+          Administrador
+        </button>
+      </div>
+
+      <!-- Modo Estudiante: login normal contra el aula virtual -->
+      <ng-container *ngIf="mode() === 'estudiante'">
+        <h2 class="form-title">Inicia sesión</h2>
+        <p class="form-subtitle">Ingresa a tu aula virtual con tu correo y contraseña.</p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="login-form" novalidate>
+
+          <label class="field">
+            <span class="field-label">Correo electrónico</span>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="tucorreo@ejemplo.com"
+              class="field-input"
+              [class.field-input--error]="form.get('email')?.invalid && form.get('email')?.touched"
+            />
+            <span
+              class="field-error"
+              *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+            >
+              Ingresa un correo válido.
+            </span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Contraseña</span>
+            <div class="password-wrap">
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="••••••••"
+                class="field-input"
+                [class.field-input--error]="form.get('password')?.invalid && form.get('password')?.touched"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                {{ showPassword() ? 'Ocultar' : 'Ver' }}
+              </button>
+            </div>
+            <span
+              class="field-error"
+              *ngIf="form.get('password')?.invalid && form.get('password')?.touched"
+            >
+              Ingresa tu contraseña.
+            </span>
+          </label>
+
+          <div class="form-alert" *ngIf="errorMessage()">
+            {{ errorMessage() }}
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="loading()">
+            {{ loading() ? 'Ingresando...' : 'Entrar al aula virtual' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <!-- Modo Administrador: redirige al panel CRM existente (login propio) -->
+      <ng-container *ngIf="mode() === 'administrador'">
+        <h2 class="form-title">Panel de administrador</h2>
+        <p class="form-subtitle">
+          La gestión de cursos, tareas, exámenes y comentarios se hace desde
+          el panel administrativo del CRM. Ahí inicias sesión con tu cuenta
+          de administrador.
+        </p>
+
+        <a [href]="adminPanelUrl" target="_blank" rel="noopener" class="submit-btn admin-link-btn">
+          Ir al panel de administrador ↗
+        </a>
+      </ng-container>
+
+    </div>
+  </main>
+
+</div>

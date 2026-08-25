@@ -1,0 +1,439 @@
+.marketplace-alert {
+  background: rgba(214, 69, 69, 0.08);
+  border: 1px solid rgba(214, 69, 69, 0.3);
+  color: #a02f2f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.marketplace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+/* ---------- Tarjeta ---------- */
+.marketplace-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 10px rgba(16, 24, 40, 0.06);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.marketplace-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 32px rgba(16, 24, 40, 0.14);
+}
+
+.marketplace-card--purchased {
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.25), 0 2px 10px rgba(16, 24, 40, 0.06);
+}
+
+/* ---------- Miniatura ---------- */
+.marketplace-thumb {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+  background: var(--color-surface-container);
+}
+
+.marketplace-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.marketplace-card:hover .marketplace-thumb img {
+  transform: scale(1.07);
+}
+
+.marketplace-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: capitalize;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.marketplace-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ffffff;
+  opacity: 0.85;
+}
+
+.marketplace-type-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(11, 31, 58, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.marketplace-purchased-ribbon {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: rgba(25, 135, 84, 0.92);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ---------- Cuerpo ---------- */
+.marketplace-body {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.marketplace-name {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--color-on-surface);
+  line-height: 1.35;
+  margin: 0 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
+}
+
+.marketplace-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-bottom: 16px;
+}
+
+.marketplace-currency {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+}
+
+.marketplace-price {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+  font-family: var(--font-display);
+}
+
+/* ---------- Botón ---------- */
+.marketplace-btn {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 11px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.marketplace-btn:hover:not(:disabled) {
+  opacity: 0.94;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.marketplace-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.marketplace-btn-arrow {
+  transition: transform 0.2s ease;
+}
+
+.marketplace-btn:hover:not(:disabled) .marketplace-btn-arrow {
+  transform: translateX(3px);
+}
+
+.marketplace-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.marketplace-btn--purchased {
+  background: #198754 !important;
+}
+
+.marketplace-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  animation: marketplace-spin 0.6s linear infinite;
+}
+
+@keyframes marketplace-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Overlay "Vista rápida" (aparece al hover sobre la imagen) ---------- */
+.marketplace-thumb {
+  cursor: pointer;
+}
+
+.marketplace-quickview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 31, 58, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.marketplace-card:hover .marketplace-quickview-overlay {
+  background: rgba(11, 31, 58, 0.35);
+  opacity: 1;
+}
+
+.marketplace-quickview-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: var(--color-on-surface);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transform: translateY(6px);
+  transition: transform 0.2s ease;
+}
+
+.marketplace-card:hover .marketplace-quickview-pill {
+  transform: translateY(0);
+}
+
+/* ---------- Modal de vista rápida ---------- */
+.quickview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 31, 58, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+  animation: quickview-fade-in 0.18s ease;
+}
+
+@keyframes quickview-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.quickview-modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  overflow: hidden;
+  animation: quickview-pop-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes quickview-pop-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.quickview-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.quickview-close:hover {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
+/* Columna izquierda: imagen fija en toda la altura del modal */
+.quickview-thumb {
+  position: relative;
+  height: 100%;
+  min-height: 320px;
+  overflow: hidden;
+  background: var(--color-surface-container);
+}
+
+.quickview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Columna derecha: contenido con scroll propio + CTA fija abajo */
+.quickview-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: 88vh;
+}
+
+.quickview-scroll {
+  padding: 24px 26px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.quickview-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-on-surface);
+  margin: 0 0 6px;
+  line-height: 1.3;
+  padding-right: 30px;
+}
+
+.quickview-info-wrap {
+  margin-top: 18px;
+}
+
+.quickview-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-on-surface-variant);
+}
+
+.marketplace-spinner--dark {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--color-primary);
+}
+
+.quickview-modules-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-on-surface-variant);
+  margin: 0 0 12px;
+}
+
+.quickview-modules {
+  display: flex;
+  flex-direction: column;
+}
+
+.quickview-module {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--color-surface-container-low, #f0f2f5);
+  transition: background 0.15s ease;
+}
+
+.quickview-module:last-child {
+  border-bottom: none;
+}
+
+.quickview-module:hover {
+  background: var(--color-surface-container-low, #f7f9fb);
+  border-radius: 8px;
+}
+
+.quickview-module-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quickview-module-text {
+  font-size: 0.85rem;
+  color: var(--color-on-surface);
+  line-height: 1.4;
+}
+
+/* CTA fija abajo, siempre visible aunque el temario tenga scroll */
+.quickview-cta {
+  padding: 16px 26px 22px;
+  border-top: 1px solid var(--color-surface-container-low, #f0f2f5);
+  background: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .quickview-modal {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+  }
+  .quickview-thumb {
+    min-height: 160px;
+  }
+  .quickview-content {
+    max-height: 70vh;
+  }
+}

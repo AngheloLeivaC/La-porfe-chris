@@ -15,6 +15,9 @@
 
     <div class="header-actions">
       <a [routerLink]="['/']" fragment="inscripcion" class="btn btn-primary hide-mobile">Iniciar Inscripción</a>
+      <a [routerLink]="[auth.isAuthenticated() ? '/aula-virtual' : '/login']" target="_blank" rel="noopener" class="btn btn-outline hide-mobile">
+        Aula Virtual
+      </a>
       <div class="header-avatar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <path
@@ -46,5 +49,8 @@
       {{ link.label }}
     </a>
     <a [routerLink]="['/']" fragment="inscripcion" class="btn btn-primary" (click)="closeMenu()">Iniciar Inscripción</a>
+    <a [routerLink]="[auth.isAuthenticated() ? '/aula-virtual' : '/login']" target="_blank" rel="noopener" class="btn btn-outline" (click)="closeMenu()">
+      Aula Virtual
+    </a>
   </div>
 </header>

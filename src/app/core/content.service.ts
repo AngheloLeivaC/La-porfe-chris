@@ -1,4 +1,5 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable, isDevMode, signal } from '@angular/core';
+import { catchError, forkJoin, map, of } from 'rxjs';
 import {
   NavLink,
   ValueProp,
@@ -7,8 +8,18 @@ import {
   Testimonial,
   Faq,
   ChatStep,
+  CrmCourseListItem,
 } from './models';
-import { allCourses } from './data/courses.data';
+import { CrmApiService } from './crm-api.service';
+import { environment } from '../../environments/environment';
+
+// Color de la insignia (badge) de cada tarjeta de curso, según el idioma.
+// Es puramente visual, no depende del CRM.
+const LANGUAGE_BADGE_COLOR: Record<CourseLanguage, string> = {
+  frances: 'rgba(0,91,178,0.9)',
+  ingles: 'rgba(75,65,225,0.9)',
+  espanol: 'rgba(153,65,0,0.9)',
+};
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +58,7 @@ export class ContentService {
     ctaLabel: 'Quiero mi guia gratis',
   };
 
-  constructor() {
+  constructor(private crmApi: CrmApiService) {
     if (isDevMode() && this.whatsappNumber === ContentService.PLACEHOLDER_WHATSAPP) {
       // eslint-disable-next-line no-console
       console.warn(
@@ -55,13 +66,44 @@ export class ContentService {
         'Actualízalo en src/app/core/content.service.ts antes de publicar el sitio.'
       );
     }
+
+    this.loadCourses();
+    this.loadHeroImage();
   }
 
+  // -------------------------------------------------------------------
+  // Imágenes: 'hero' arranca con el asset local y se reemplaza por el
+  // primer banner activo del CRM en cuanto llega la respuesta (si hay
+  // banners configurados). Así nunca se ve un hueco en blanco mientras
+  // carga.
+  // -------------------------------------------------------------------
   readonly images = {
     logo: 'assets/images/logo.png',
     logoFooter: 'assets/images/logo.png',
     hero: 'assets/images/hero.png',
   };
+
+  /** Imagen del hero. Signal para que el componente se actualice solo
+   *  cuando llegue el banner del CRM (o se quede con el asset local si
+   *  no hay banners activos). */
+  readonly heroImage = signal<string>(this.images.hero);
+
+  private loadHeroImage(): void {
+    this.crmApi
+      .getBanners()
+      .pipe(
+        catchError((error) => {
+          console.error('[La Profe Chris] No se pudieron cargar los banners del CRM:', error);
+          return of([]);
+        })
+      )
+      .subscribe((banners) => {
+        if (banners.length > 0) {
+          this.heroImage.set(banners[0].image);
+        }
+        // Si no hay banners activos, se queda con this.images.hero (local).
+      });
+  }
 
   readonly navLinks: NavLink[] = [
     { id: 'inicio', label: 'Inicio' },
@@ -101,7 +143,84 @@ export class ContentService {
     { id: 'espanol', label: 'Español', flag: '🇪🇸' },
   ];
 
-  readonly courses: Course[] = allCourses;
+  // -------------------------------------------------------------------
+  // Cursos: ya NO viven hardcodeados acá. Se traen del CRM al arrancar
+  // la app (loadCourses) y se exponen como signal para que las tarjetas
+  // se actualicen solas en cuanto llega la respuesta.
+  // -------------------------------------------------------------------
+  readonly courses = signal<Course[]>([]);
+  readonly coursesLoading = signal<boolean>(true);
+  readonly coursesError = signal<boolean>(false);
+
+  private loadCourses(): void {
+    this.coursesLoading.set(true);
+    this.coursesError.set(false);
+
+    this.crmApi
+      .getCourses()
+      .pipe(
+        catchError((error) => {
+          console.error('[La Profe Chris] No se pudieron cargar los cursos del CRM:', error);
+          this.coursesError.set(true);
+          return of([] as CrmCourseListItem[]);
+        })
+      )
+      .subscribe((items) => {
+        this.courses.set(items.map((item) => this.mapListItemToCourse(item)));
+        this.coursesLoading.set(false);
+      });
+  }
+
+  private mapCategoryToLanguage(categoria: string | undefined): CourseLanguage {
+    const normalized = (categoria || '').trim().toLowerCase();
+    if (normalized.includes('franc')) return 'frances';
+    if (normalized.includes('ingl')) return 'ingles';
+    if (normalized.includes('espa')) return 'espanol';
+
+    // Si la categoría del CRM no calza con ninguno de los 3 idiomas
+    // (por ejemplo, si course_categories todavía no tiene "Francés",
+    // "Inglés" y "Español" creadas), cae en 'frances' por defecto y
+    // avisa por consola para que se revise en el CRM.
+    console.warn(
+      `[La Profe Chris] Categoría "${categoria}" no se reconoce como idioma. ` +
+      `Revisa que exista una categoría en course_categories llamada ` +
+      `"Francés", "Inglés" o "Español". Se está usando "frances" por defecto.`
+    );
+    return 'frances';
+  }
+
+  /** Arma la URL completa de una imagen guardada en S3. */
+  resolveImageUrl(path: string | undefined): string {
+    if (!path) return this.images.hero;
+    if (path.startsWith('http')) return path;
+    const separator = path.startsWith('/') ? '' : '/';
+    return `${environment.storageBaseUrl}${separator}${path}`;
+  }
+
+  private mapListItemToCourse(item: CrmCourseListItem): Course {
+    const language = this.mapCategoryToLanguage(item.categoria);
+    return {
+      language,
+      slug: item.slug,
+      // 'level' y 'weeks' no existen todavía como columnas en la tabla
+      // 'productos' del CRM. Mientras tanto usamos el tipo de producto
+      // (Curso/Diplomado) como aproximación. Si quieres mostrar el nivel
+      // real (Principiante/Intermedio/Avanzado) y la duración en semanas,
+      // agrega columnas 'nivel' y 'duracion' en 'productos' y mapéalas
+      // aquí igual que 'tipo'.
+      level: item.tipo ?? '',
+      badgeColor: LANGUAGE_BADGE_COLOR[language],
+      title: item.nombre,
+      price: `S/. ${Number(item.precio).toFixed(2)}`,
+      // El teaser corto ('text') no viene en el listado (solo en el
+      // detalle, como 'descripcion'), así que se completa al entrar al
+      // detalle del curso. Aquí queda vacío para no pegarle un fetch
+      // extra a cada tarjeta.
+      text: '',
+      weeks: '',
+      img: this.resolveImageUrl(item.portada_url),
+    };
+  }
 
   readonly testimonials: Testimonial[] = [
     {
@@ -181,14 +300,66 @@ export class ContentService {
   };
 
   // Usado por la página de detalle de curso (/curso/:idioma/:slug) para
-  // encontrar el curso exacto según la URL.
+  // encontrar el curso exacto según la URL, a partir de lo que YA se
+  // cargó en el listado (title, price, img). Los campos de detalle
+  // (descripción, temario, video) se completan aparte con
+  // loadCourseDetail(), porque el listado del CRM no los trae.
   findCourse(language: string, slug: string): Course | undefined {
-    return this.courses.find((c) => c.language === language && c.slug === slug);
+    return this.courses().find((c) => c.language === language && c.slug === slug);
   }
 
-  // Usado por el selector "Explorar niveles" dentro de la página de detalle,
-  // para listar los demás cursos del mismo idioma y poder saltar entre ellos.
+  // Usado por el selector "Explorar niveles" dentro de la página de
+  // detalle, para listar los demás cursos del mismo idioma.
   coursesByLanguage(language: string): Course[] {
-    return this.courses.filter((c) => c.language === language);
+    return this.courses().filter((c) => c.language === language);
+  }
+
+  /**
+   * Carga toda la info adicional del curso que el listado no trae:
+   * descripción/objetivo/will_learn (detalle), temario (módulos +
+   * lecciones) y el video de preview. Se usa en CourseDetailComponent.
+   *
+   * Si el curso todavía no tiene un video "is_preview" configurado en el
+   * CRM, sigue funcionando igual, solo que sin video (ver nota en
+   * crm-api.service.ts).
+   */
+  loadCourseDetail(baseCourse: Course) {
+    return forkJoin({
+      details: this.crmApi.getCourseDetails(baseCourse.slug).pipe(
+        catchError((error) => {
+          console.error('[La Profe Chris] Error al cargar el detalle del curso:', error);
+          return of(null);
+        })
+      ),
+      temary: this.crmApi.getCourseTemary(baseCourse.slug).pipe(
+        catchError((error) => {
+          console.error('[La Profe Chris] Error al cargar el temario del curso:', error);
+          return of(null);
+        })
+      ),
+      video: this.crmApi.getCoursePreviewVideo(baseCourse.slug).pipe(
+        catchError(() => of(undefined)) // Es normal que falte: no todos los cursos tienen preview aún.
+      ),
+    }).pipe(
+      map(({ details, temary, video }): Course => ({
+        ...baseCourse,
+        // 'descripcion' del CRM se usa como el texto largo de la página
+        // de detalle (el 'text' corto de la tarjeta se queda vacío por
+        // ahora, ver nota en mapListItemToCourse).
+        text: details?.descripcion ?? baseCourse.text,
+        certificateText: `Al completar el curso ${baseCourse.title}`,
+        video,
+        includes: [
+          'Acceso de por vida al contenido',
+          'Materiales descargables y ejercicios',
+          'Comunidad privada de estudiantes',
+          'Sesiones de resolución de dudas Q&A',
+        ],
+        modules: (temary?.modules ?? []).map((m) => ({
+          title: m.name,
+          lessons: (m.lessons ?? []).map((lesson) => lesson.name),
+        })),
+      }))
+    );
   }
 }

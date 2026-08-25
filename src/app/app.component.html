@@ -1,9 +1,9 @@
-<app-header></app-header>
+<app-header *ngIf="showMarketingShell()"></app-header>
 
 <main class="main-content">
   <router-outlet></router-outlet>
 </main>
 
-<app-footer></app-footer>
+<app-footer *ngIf="showMarketingShell()"></app-footer>
 
-<app-chatbot></app-chatbot>
+<app-chatbot *ngIf="showMarketingShell()"></app-chatbot>

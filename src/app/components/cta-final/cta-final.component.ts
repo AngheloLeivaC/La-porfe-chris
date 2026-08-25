@@ -37,7 +37,7 @@ export class CtaFinalComponent {
   // solo (no hay que tocar nada más al agregar cursos nuevos en content.service.ts).
   get coursesForSelectedLanguage() {
     if (!this.model.language) return [];
-    return this.content.courses.filter((c) => c.language === this.model.language);
+    return this.content.courses().filter((c) => c.language === this.model.language);
   }
 
   onLanguageChange(): void {

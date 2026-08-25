@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ContentService } from '../../core/content.service';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -15,7 +16,7 @@ export class HeaderComponent implements OnInit {
   scrolled = false;
   activeSection = 'inicio';
 
-  constructor(public content: ContentService) { }
+  constructor(public content: ContentService, public auth: AuthService) { }
 
   ngOnInit(): void {
     this.updateActiveSection();

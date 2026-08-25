@@ -1,0 +1,157 @@
+<h1 class="aula-title">Marketplace</h1>
+<p class="aula-subtitle">Explora todos nuestros cursos y adquiere el que necesites.</p>
+
+<div *ngIf="loading()" class="aula-state">Cargando cursos...</div>
+
+<div *ngIf="!loading() && loadError()" class="aula-state aula-state--error">
+  No pudimos cargar el catálogo en este momento. Intenta recargar la página.
+</div>
+
+<div *ngIf="errorMessage()" class="marketplace-alert">
+  {{ errorMessage() }}
+</div>
+
+<!-- Botón de compra reutilizable (tarjeta y modal comparten esta misma lógica) -->
+<ng-template #buyButtonTpl let-course="course">
+  <button
+    class="marketplace-btn"
+    [class.marketplace-btn--purchased]="isPurchased(course)"
+    [style.background]="isPurchased(course) ? '' : badgeColor(course)"
+    [disabled]="isPurchasing(course) || isPurchased(course)"
+    (click)="comprar(course)"
+  >
+    <ng-container *ngIf="isPurchased(course)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+      Comprado
+    </ng-container>
+
+    <ng-container *ngIf="!isPurchased(course) && isPurchasing(course)">
+      <span class="marketplace-spinner"></span>
+      Procesando...
+    </ng-container>
+
+    <ng-container *ngIf="!isPurchased(course) && !isPurchasing(course)">
+      Comprar curso
+      <svg class="marketplace-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </ng-container>
+  </button>
+</ng-template>
+
+<div *ngIf="!loading() && !loadError()" class="marketplace-grid">
+  <div
+    class="marketplace-card"
+    *ngFor="let course of courses()"
+    [class.marketplace-card--purchased]="isPurchased(course)"
+  >
+    <div class="marketplace-thumb" (click)="openQuickView(course)">
+      <img [src]="courseImage(course)" [alt]="course.nombre" />
+
+      <span class="marketplace-badge" [style.background]="badgeColor(course)">
+        <span class="marketplace-badge-dot"></span>
+        {{ course.categoria }}
+      </span>
+
+      <span class="marketplace-type-tag" *ngIf="course.tipo">{{ course.tipo }}</span>
+
+      <div class="marketplace-purchased-ribbon" *ngIf="isPurchased(course)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+        Comprado
+      </div>
+
+      <div class="marketplace-quickview-overlay">
+        <span class="marketplace-quickview-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          Vista rápida
+        </span>
+      </div>
+    </div>
+
+    <div class="marketplace-body">
+      <p class="marketplace-name">{{ course.nombre }}</p>
+
+      <div class="marketplace-price-row">
+        <span class="marketplace-currency">S/</span>
+        <span class="marketplace-price">{{ priceLabel(course) }}</span>
+      </div>
+
+      <ng-container *ngTemplateOutlet="buyButtonTpl; context: { course: course }"></ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de vista rápida -->
+<div class="quickview-overlay" *ngIf="quickViewCourse() as course" (click)="closeQuickView()">
+  <div class="quickview-modal" (click)="$event.stopPropagation()">
+
+    <button class="quickview-close" (click)="closeQuickView()" aria-label="Cerrar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Columna izquierda: imagen fija -->
+    <div class="quickview-thumb">
+      <img [src]="courseImage(course)" [alt]="course.nombre" />
+      <span class="marketplace-badge" [style.background]="badgeColor(course)">
+        <span class="marketplace-badge-dot"></span>
+        {{ course.categoria }}
+      </span>
+      <span class="marketplace-type-tag" *ngIf="course.tipo">{{ course.tipo }}</span>
+    </div>
+
+    <!-- Columna derecha: contenido con scroll + CTA fija abajo -->
+    <div class="quickview-content">
+
+      <div class="quickview-scroll">
+        <p class="quickview-title">{{ course.nombre }}</p>
+
+        <div class="marketplace-price-row">
+          <span class="marketplace-currency">S/</span>
+          <span class="marketplace-price">{{ priceLabel(course) }}</span>
+        </div>
+
+        <div [ngSwitch]="quickViewInfo(course)?.status" class="quickview-info-wrap">
+          <div *ngSwitchCase="'loading'" class="quickview-loading">
+            <span class="marketplace-spinner marketplace-spinner--dark"></span>
+            Cargando temario del curso...
+          </div>
+          <div *ngSwitchCase="'error'" class="quickview-loading">No se pudo cargar el temario.</div>
+
+          <ng-container *ngSwitchCase="'ready'">
+            <p class="quickview-modules-title" *ngIf="(quickViewInfo(course)?.modules?.length ?? 0) > 0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+              </svg>
+              Temario del curso
+            </p>
+
+            <div class="quickview-modules" *ngIf="(quickViewInfo(course)?.modules?.length ?? 0) > 0">
+              <div class="quickview-module" *ngFor="let modulo of quickViewInfo(course)?.modules; let i = index">
+                <span class="quickview-module-num" [style.background]="badgeColor(course)">{{ i + 1 }}</span>
+                <span class="quickview-module-text">{{ modulo }}</span>
+              </div>
+            </div>
+
+            <div class="quickview-loading" *ngIf="(quickViewInfo(course)?.modules?.length ?? 0) === 0">
+              Este curso todavía no tiene un temario cargado.
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="quickview-cta">
+        <ng-container *ngTemplateOutlet="buyButtonTpl; context: { course: course }"></ng-container>
+      </div>
+
+    </div>
+  </div>
+</div>

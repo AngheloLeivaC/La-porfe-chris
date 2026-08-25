@@ -29,7 +29,17 @@
       </a>
     </div>
 
-    <div class="courses-grid" *ngIf="filteredCourses.length; else sinCursos">
+    <div class="courses-grid" *ngIf="loading">
+      <p class="courses-loading">Cargando cursos...</p>
+    </div>
+
+    <div class="courses-grid" *ngIf="!loading && loadError">
+      <p class="courses-loading">
+        No pudimos cargar los cursos en este momento. Intenta recargar la página.
+      </p>
+    </div>
+
+    <div class="courses-grid" *ngIf="!loading && !loadError && filteredCourses.length; else sinCursos">
       <div
         class="course-card"
         *ngFor="let c of filteredCourses; let i = index"
