@@ -17,6 +17,7 @@ export class CourseDetailComponent implements OnInit {
 
   course?: Course;
   notFound = false;
+  loadingDetail = false;
   videoPlaying = false;
   openModuleIndex: number | null = 0;
   showEnrollmentModal = false;
@@ -28,10 +29,29 @@ export class CourseDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      const language = params.get('idioma') ?? '';
       const slug = params.get('slug') ?? '';
-      this.course = this.content.findCourse(language, slug);
-      this.notFound = !this.course;
+
+      this.notFound = false;
+      this.course = undefined;
+      this.loadingDetail = true;
+
+      // Carga el curso DIRECTO por su slug (endpoint /course/details/{slug},
+      // que ya trae 'categoria' y 'tipo' correctamente desde el backend).
+      // Antes dependía de que el listado general (/course/list) ya hubiera
+      // cargado y tuviera el idioma bien mapeado — eso lo hacía frágil ante
+      // recargas directas de página (F5) y dependía de un bug del backend
+      // en /course/list que no traía 'categoria'.
+      this.content.loadCourseBySlug(slug).subscribe({
+        next: (course: Course) => {
+          this.course = course;
+          this.loadingDetail = false;
+        },
+        error: () => {
+          this.notFound = true;
+          this.loadingDetail = false;
+        },
+      });
+
       this.videoPlaying = false;
       this.openModuleIndex = 0;
       window.scrollTo({ top: 0 });

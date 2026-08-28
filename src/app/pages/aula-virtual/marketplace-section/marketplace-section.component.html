@@ -39,6 +39,15 @@
       </svg>
     </ng-container>
   </button>
+
+  <button
+    *ngIf="!isPurchased(course)"
+    class="marketplace-btn-stripe"
+    [disabled]="isPurchasing(course)"
+    (click)="pagarConStripe(course)"
+  >
+    O pagar con tarjeta (Stripe)
+  </button>
 </ng-template>
 
 <div *ngIf="!loading() && !loadError()" class="marketplace-grid">

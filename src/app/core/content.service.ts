@@ -1,5 +1,5 @@
 import { Injectable, isDevMode, signal } from '@angular/core';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, forkJoin, map, of, Observable } from 'rxjs';
 import {
   NavLink,
   ValueProp,
@@ -299,11 +299,8 @@ export class ContentService {
     },
   };
 
-  // Usado por la página de detalle de curso (/curso/:idioma/:slug) para
-  // encontrar el curso exacto según la URL, a partir de lo que YA se
-  // cargó en el listado (title, price, img). Los campos de detalle
-  // (descripción, temario, video) se completan aparte con
-  // loadCourseDetail(), porque el listado del CRM no los trae.
+  // Ya no la usa la página de detalle (ver loadCourseBySlug), pero se
+  // deja disponible por si se necesita buscar en la lista ya cargada.
   findCourse(language: string, slug: string): Course | undefined {
     return this.courses().find((c) => c.language === language && c.slug === slug);
   }
@@ -315,51 +312,58 @@ export class ContentService {
   }
 
   /**
-   * Carga toda la info adicional del curso que el listado no trae:
-   * descripción/objetivo/will_learn (detalle), temario (módulos +
-   * lecciones) y el video de preview. Se usa en CourseDetailComponent.
+   * Carga el curso COMPLETO directo por su slug, usando
+   * /public/course/details/{slug} como fuente principal (ese endpoint ya
+   * trae 'categoria' y 'tipo' bien resueltos desde el backend, a
+   * diferencia de /public/course/list que todavía no los incluye).
    *
-   * Si el curso todavía no tiene un video "is_preview" configurado en el
-   * CRM, sigue funcionando igual, solo que sin video (ver nota en
-   * crm-api.service.ts).
+   * No depende de que el listado general (content.courses()) ya haya
+   * cargado, así que funciona igual de bien con una recarga directa de
+   * la página (F5) que navegando desde el listado.
+   *
+   * Si el curso no existe, el observable falla (error real -> "no
+   * encontrado"). El temario y el video sí se degradan con gracia si
+   * fallan, porque es normal que algún curso aún no los tenga cargados.
    */
-  loadCourseDetail(baseCourse: Course) {
+  loadCourseBySlug(slug: string): Observable<Course> {
     return forkJoin({
-      details: this.crmApi.getCourseDetails(baseCourse.slug).pipe(
-        catchError((error) => {
-          console.error('[La Profe Chris] Error al cargar el detalle del curso:', error);
-          return of(null);
-        })
-      ),
-      temary: this.crmApi.getCourseTemary(baseCourse.slug).pipe(
+      details: this.crmApi.getCourseDetails(slug),
+      temary: this.crmApi.getCourseTemary(slug).pipe(
         catchError((error) => {
           console.error('[La Profe Chris] Error al cargar el temario del curso:', error);
           return of(null);
         })
       ),
-      video: this.crmApi.getCoursePreviewVideo(baseCourse.slug).pipe(
+      video: this.crmApi.getCoursePreviewVideo(slug).pipe(
         catchError(() => of(undefined)) // Es normal que falte: no todos los cursos tienen preview aún.
       ),
     }).pipe(
-      map(({ details, temary, video }): Course => ({
-        ...baseCourse,
-        // 'descripcion' del CRM se usa como el texto largo de la página
-        // de detalle (el 'text' corto de la tarjeta se queda vacío por
-        // ahora, ver nota en mapListItemToCourse).
-        text: details?.descripcion ?? baseCourse.text,
-        certificateText: `Al completar el curso ${baseCourse.title}`,
-        video,
-        includes: [
-          'Acceso de por vida al contenido',
-          'Materiales descargables y ejercicios',
-          'Comunidad privada de estudiantes',
-          'Sesiones de resolución de dudas Q&A',
-        ],
-        modules: (temary?.modules ?? []).map((m) => ({
-          title: m.name,
-          lessons: (m.lessons ?? []).map((lesson) => lesson.name),
-        })),
-      }))
+      map(({ details, temary, video }): Course => {
+        const language = this.mapCategoryToLanguage(details.categoria);
+        return {
+          language,
+          slug: details.slug,
+          level: details.tipo ?? '',
+          badgeColor: LANGUAGE_BADGE_COLOR[language],
+          title: details.nombre,
+          price: `S/. ${Number(details.precio).toFixed(2)}`,
+          text: details.descripcion || '',
+          weeks: '',
+          img: this.resolveImageUrl(details.portada_url),
+          certificateText: `Al completar el curso ${details.nombre}`,
+          video,
+          includes: [
+            'Acceso de por vida al contenido',
+            'Materiales descargables y ejercicios',
+            'Comunidad privada de estudiantes',
+            'Sesiones de resolución de dudas Q&A',
+          ],
+          modules: (temary?.modules ?? []).map((m) => ({
+            title: m.name,
+            lessons: (m.lessons ?? []).map((lesson) => lesson.name),
+          })),
+        };
+      })
     );
   }
 }

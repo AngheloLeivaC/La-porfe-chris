@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: 85vh;
+  min-height: clamp(480px, 85vh, 820px);
   display: flex;
   align-items: center;
 }
@@ -16,6 +16,15 @@
 @media (min-width: 901px) {
   .hero-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 900px) {
+  /* Más aire a los costados en móvil, para que el texto no quede pegado
+     al borde de la pantalla. El .container normal ya trae 32px
+     (--margin-desktop); esto lo sube a 44px solo acá en el hero. */
+  .hero .container {
+    padding-left: 44px;
+    padding-right: 44px;
   }
 }
 .hero-content {
@@ -69,6 +78,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .hero-cta-row {
+    justify-content: center;
+  }
 }
 .hero-social-proof {
   display: flex;

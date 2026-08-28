@@ -90,7 +90,9 @@
             Curso de {{ languageLabel }}
           </p>
           <h1 class="course-detail-title">{{ course.title }}</h1>
-          <p class="course-detail-text">{{ course.text }}</p>
+      <p *ngIf="loadingDetail" class="course-detail-loading-note">
+        Cargando temario y video del curso...
+      </p>
 
           <div class="course-detail-meta">
             <div class="course-detail-chip">

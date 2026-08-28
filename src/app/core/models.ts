@@ -136,3 +136,14 @@ export interface PurchasedCourse {
   slug_product?: string;
   tipo_producto_id?: number;
 }
+
+/** Una fila del panel "Actividades" (tarea o examen con fecha). */
+export interface ActivityItem {
+  id: number;
+  type: 'tarea' | 'examen';
+  title: string;
+  description: string | null;
+  due_date: string;
+  course_name: string | null;
+  completed: boolean;
+}

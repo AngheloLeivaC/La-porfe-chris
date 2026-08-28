@@ -41,40 +41,59 @@
 
     <main class="aula-main">
 
+      <div
+        *ngIf="stripeMessage() as msg"
+        class="stripe-banner"
+        [class.stripe-banner--success]="msg.type === 'success'"
+        [class.stripe-banner--cancelled]="msg.type === 'cancelled'"
+      >
+        {{ msg.text }}
+        <button class="stripe-banner-close" (click)="stripeMessage.set(null)" aria-label="Cerrar">✕</button>
+      </div>
+
+
       <!-- Sección: Mis Cursos -->
       <ng-container *ngIf="activeSection() === 'mis-cursos'">
-        <h1 class="aula-title">Mis Cursos</h1>
-        <p class="aula-subtitle">Continúa tu aprendizaje justo donde lo dejaste.</p>
+        <div class="mis-cursos-layout">
+          <div class="mis-cursos-main">
+            <h1 class="aula-title">Mis Cursos</h1>
+            <p class="aula-subtitle">Continúa tu aprendizaje justo donde lo dejaste.</p>
 
-        <div *ngIf="loading()" class="aula-state">Cargando tus cursos...</div>
+            <div *ngIf="loading()" class="aula-state">Cargando tus cursos...</div>
 
-        <div *ngIf="!loading() && loadError()" class="aula-state aula-state--error">
-          No pudimos cargar tus cursos en este momento. Intenta recargar la página.
-        </div>
-
-        <div *ngIf="!loading() && !loadError() && courses().length === 0" class="aula-state">
-          Todavía no tienes cursos activos. Explora nuestro Marketplace para empezar.
-        </div>
-
-        <div *ngIf="!loading() && !loadError() && courses().length > 0" class="courses-grid">
-          <div class="course-card" *ngFor="let course of courses()">
-            <div class="course-thumb">
-              <img [src]="courseImage(course)" [alt]="course.nombre" />
-              <span class="course-badge" [ngClass]="courseStatus(course).className">
-                {{ courseStatus(course).label }}
-              </span>
+            <div *ngIf="!loading() && loadError()" class="aula-state aula-state--error">
+              No pudimos cargar tus cursos en este momento. Intenta recargar la página.
             </div>
-            <div class="course-body">
-              <p class="course-name">{{ course.nombre }}</p>
-              <button
-                class="course-btn"
-                [ngClass]="courseStatus(course).className + '-btn'"
-                [disabled]="course.is_blocked === 1"
-              >
-                {{ course.is_blocked === 1 ? 'Bloqueado' : 'Continuar' }}
-              </button>
+
+            <div *ngIf="!loading() && !loadError() && courses().length === 0" class="aula-state">
+              Todavía no tienes cursos activos. Explora nuestro Marketplace para empezar.
+            </div>
+
+            <div *ngIf="!loading() && !loadError() && courses().length > 0" class="courses-grid">
+              <div class="course-card" *ngFor="let course of courses()">
+                <div class="course-thumb">
+                  <img [src]="courseImage(course)" [alt]="course.nombre" />
+                  <span class="course-badge" [ngClass]="courseStatus(course).className">
+                    {{ courseStatus(course).label }}
+                  </span>
+                </div>
+                <div class="course-body">
+                  <p class="course-name">{{ course.nombre }}</p>
+                  <button
+                    class="course-btn"
+                    [ngClass]="courseStatus(course).className + '-btn'"
+                    [disabled]="course.is_blocked === 1"
+                  >
+                    {{ course.is_blocked === 1 ? 'Bloqueado' : 'Continuar' }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+
+          <aside class="mis-cursos-side">
+            <app-activities-panel></app-activities-panel>
+          </aside>
         </div>
       </ng-container>
 

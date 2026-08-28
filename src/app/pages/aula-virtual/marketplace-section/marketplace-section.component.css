@@ -188,6 +188,30 @@
   opacity: 0.75;
 }
 
+.marketplace-btn-stripe {
+  width: 100%;
+  border: 1.5px solid var(--color-outline-variant, #d0d5dd);
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  border-radius: 999px;
+  padding: 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.marketplace-btn-stripe:hover:not(:disabled) {
+  background: var(--color-surface-container-low, #f7f9fb);
+  border-color: var(--color-on-surface-variant);
+}
+
+.marketplace-btn-stripe:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .marketplace-btn--purchased {
   background: #198754 !important;
 }

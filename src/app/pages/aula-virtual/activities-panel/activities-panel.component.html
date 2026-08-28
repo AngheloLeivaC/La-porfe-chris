@@ -1,0 +1,50 @@
+<div class="activities-panel">
+  <p class="activities-title">Actividades</p>
+
+  <div *ngIf="loading()" class="activities-state">Cargando...</div>
+
+  <div *ngIf="!loading() && loadError()" class="activities-state activities-state--error">
+    No se pudieron cargar tus actividades.
+  </div>
+
+  <div *ngIf="!loading() && !loadError() && activities().length === 0" class="activities-state">
+    No tienes tareas ni exámenes pendientes por ahora.
+  </div>
+
+  <div *ngIf="!loading() && !loadError() && activities().length > 0" class="activities-list">
+    <div
+      class="activity-item"
+      *ngFor="let item of activities()"
+      [class.activity-item--completed]="item.completed"
+      [class.activity-item--overdue]="isOverdue(item)"
+    >
+      <button
+        *ngIf="item.type === 'tarea'"
+        class="activity-checkbox"
+        [class.activity-checkbox--checked]="item.completed"
+        [disabled]="isToggling(item)"
+        (click)="toggleComplete(item)"
+        [attr.aria-label]="item.completed ? 'Marcar como pendiente' : 'Marcar como completada'"
+      >
+        <svg *ngIf="item.completed" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </button>
+
+      <span class="activity-exam-icon" *ngIf="item.type === 'examen'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      </span>
+
+      <div class="activity-body">
+        <p class="activity-item-title">{{ item.title }}</p>
+        <span class="activity-item-meta">
+          {{ item.course_name }} · {{ item.type === 'examen' ? 'Examen' : 'Tarea' }} ·
+          <span [class.activity-overdue-text]="isOverdue(item)">{{ dueLabel(item) }}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

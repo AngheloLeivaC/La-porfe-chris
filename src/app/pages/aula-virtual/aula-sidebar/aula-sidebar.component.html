@@ -1,7 +1,11 @@
 <!-- Overlay para cerrar el sidebar en mobile al tocar afuera -->
 <div class="sidebar-overlay" *ngIf="mobileOpen" (click)="closeMobile.emit()"></div>
 
-<aside class="aula-sidebar" [class.aula-sidebar--open]="mobileOpen">
+<aside
+  class="aula-sidebar"
+  [class.aula-sidebar--open]="mobileOpen"
+  [class.aula-sidebar--expanded]="expanded()"
+>
 
   <nav class="sidebar-nav">
     <button

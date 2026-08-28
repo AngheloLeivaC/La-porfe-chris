@@ -147,6 +147,27 @@ export class MarketplaceSectionComponent implements OnInit {
     });
   }
 
+  pagarConStripe(course: CrmCourseListItem): void {
+    const user = this.auth.currentUser();
+    if (!user) return;
+
+    this.errorMessage.set(null);
+    this.setPurchasing(course.id, true);
+
+    this.crmApi.createStripeCheckoutSession(user.id, course.id).subscribe({
+      next: ({ url }) => {
+        // Redirige a la página de pago de Stripe (hospedada por Stripe,
+        // no en nuestro sitio). El acceso al curso se otorga cuando
+        // Stripe llama al webhook del backend, no acá.
+        window.location.href = url;
+      },
+      error: () => {
+        this.errorMessage.set('No se pudo iniciar el pago con Stripe. Intenta nuevamente.');
+        this.setPurchasing(course.id, false);
+      },
+    });
+  }
+
   openQuickView(course: CrmCourseListItem): void {
     this.quickViewCourse.set(course);
     document.body.style.overflow = 'hidden';

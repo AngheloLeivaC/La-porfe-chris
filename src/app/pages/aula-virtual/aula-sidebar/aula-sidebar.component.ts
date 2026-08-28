@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type AulaSection = 'mis-cursos' | 'certificaciones' | 'marketplace' | 'inicio' | 'calendario' | 'configuracion';
@@ -21,6 +28,11 @@ export class AulaSidebarComponent {
   @Output() sectionChange = new EventEmitter<AulaSection>();
   @Output() closeMobile = new EventEmitter<void>();
 
+  // Colapsado por defecto (solo íconos). Al pasar el mouse por encima se
+  // expande (con texto) y el contenido se achica; al sacar el mouse,
+  // vuelve a colapsarse y el contenido se agranda de nuevo.
+  readonly expanded = signal(false);
+
   readonly items: SidebarItem[] = [
     { id: 'mis-cursos', label: 'Mis Cursos' },
     { id: 'certificaciones', label: 'Certificaciones' },
@@ -33,5 +45,15 @@ export class AulaSidebarComponent {
   select(id: AulaSection): void {
     this.sectionChange.emit(id);
     this.closeMobile.emit();
+  }
+
+  @HostListener('mouseenter')
+  onMouseEnter(): void {
+    this.expanded.set(true);
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
+    this.expanded.set(false);
   }
 }

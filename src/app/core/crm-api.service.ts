@@ -9,6 +9,7 @@ import {
   CrmBanner,
   LoginEnvelope,
   PurchasedCourse,
+  ActivityItem,
 } from './models';
 
 /**
@@ -64,8 +65,6 @@ export class CrmApiService {
     return this.http.get<CrmBanner[]>(`${this.baseUrl}/public/banners/list`);
   }
 
-  /** Login del aula virtual. Mismo endpoint que usa el sistema actual.
-   *  El backend envuelve la respuesta real dentro de 'data'. */
   login(email: string, password: string): Observable<LoginEnvelope> {
     return this.http.post<LoginEnvelope>(`${this.baseUrl}/public/auth/login`, {
       email,
@@ -73,14 +72,13 @@ export class CrmApiService {
     });
   }
 
-  /** Cursos ya comprados por el alumno logueado (requiere Bearer token). */
+ 
   getPurchasedProducts(userId: number): Observable<PurchasedCourse[]> {
     return this.http.get<PurchasedCourse[]>(
       `${this.baseUrl}/user/${userId}/purchased-products`
     );
   }
 
-  /** Registra la compra de un curso ya pagado (mismo endpoint que Buy.vue). */
   savePayment(payload: {
     user_id: number;
     product_id: number;
@@ -89,5 +87,33 @@ export class CrmApiService {
     product_type: number;
   }): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/payments/save-payment`, payload);
+  }
+
+
+  getActivities(userId: number): Observable<ActivityItem[]> {
+    return this.http.get<ActivityItem[]>(`${this.baseUrl}/user/${userId}/activities`);
+  }
+
+  markTaskComplete(tareaId: number, userId: number): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/tareas/${tareaId}/complete`, {
+      user_id: userId,
+    });
+  }
+
+  markTaskIncomplete(tareaId: number, userId: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/tareas/${tareaId}/complete`, {
+      body: { user_id: userId },
+    });
+  }
+
+  /** Crea una sesión de pago de Stripe y devuelve la URL a la que redirigir. */
+  createStripeCheckoutSession(
+    userId: number,
+    productId: number
+  ): Observable<{ url: string }> {
+    return this.http.post<{ url: string }>(
+      `${this.baseUrl}/payments/stripe/create-checkout-session`,
+      { user_id: userId, product_id: productId }
+    );
   }
 }

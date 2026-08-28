@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { CrmApiService } from '../../core/crm-api.service';
 import { ContentService } from '../../core/content.service';
@@ -8,11 +8,12 @@ import { PurchasedCourse } from '../../core/models';
 import { environment } from '../../../environments/environment';
 import { AulaSidebarComponent, AulaSection } from './aula-sidebar/aula-sidebar.component';
 import { MarketplaceSectionComponent } from './marketplace-section/marketplace-section.component';
+import { ActivitiesPanelComponent } from './activities-panel/activities-panel.component';
 
 @Component({
   selector: 'app-aula-virtual',
   standalone: true,
-  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent],
+  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent, ActivitiesPanelComponent],
   templateUrl: './aula-virtual.component.html',
   styleUrl: './aula-virtual.component.css',
 })
@@ -23,16 +24,36 @@ export class AulaVirtualComponent implements OnInit {
 
   readonly activeSection = signal<AulaSection>('mis-cursos');
   readonly mobileSidebarOpen = signal(false);
+  readonly stripeMessage = signal<{ type: 'success' | 'cancelled'; text: string } | null>(null);
 
   constructor(
     public auth: AuthService,
     private crmApi: CrmApiService,
-    public content: ContentService
+    public content: ContentService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     const user = this.auth.currentUser();
     if (!user) return;
+
+    // Vuelta desde Stripe Checkout (?stripe=success | ?stripe=cancelled).
+    // El acceso real al curso lo otorga el webhook del backend, no esto
+    // — este mensaje es solo para avisarle al alumno qué pasó.
+    this.route.queryParamMap.subscribe((params) => {
+      const stripeResult = params.get('stripe');
+      if (stripeResult === 'success') {
+        this.stripeMessage.set({
+          type: 'success',
+          text: '¡Pago recibido! Tu curso puede tardar unos segundos en aparecer en "Mis Cursos".',
+        });
+      } else if (stripeResult === 'cancelled') {
+        this.stripeMessage.set({
+          type: 'cancelled',
+          text: 'Cancelaste el pago con Stripe. No se realizó ningún cargo.',
+        });
+      }
+    });
 
     this.crmApi.getPurchasedProducts(user.id).subscribe({
       next: (courses) => {
