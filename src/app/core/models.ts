@@ -76,6 +76,9 @@ export interface CrmCourseListItem {
   course_categories_id: number;
   categoria: string;
   tipo?: string; // 'Curso' | 'Diplomado' (viene del join con tipo_productos)
+  nivel?: string; // 'Principiante' | 'Elemental' | 'Intermedio' | 'Avanzado'
+  duracion_semanas?: number;
+  resumen_corto?: string;
 }
 
 export interface CrmCourseDetails extends CrmCourseListItem {

@@ -71,21 +71,13 @@ export class ContentService {
     this.loadHeroImage();
   }
 
-  // -------------------------------------------------------------------
-  // Imágenes: 'hero' arranca con el asset local y se reemplaza por el
-  // primer banner activo del CRM en cuanto llega la respuesta (si hay
-  // banners configurados). Así nunca se ve un hueco en blanco mientras
-  // carga.
-  // -------------------------------------------------------------------
+
   readonly images = {
     logo: 'assets/images/logo.png',
     logoFooter: 'assets/images/logo.png',
     hero: 'assets/images/hero.png',
   };
 
-  /** Imagen del hero. Signal para que el componente se actualice solo
-   *  cuando llegue el banner del CRM (o se quede con el asset local si
-   *  no hay banners activos). */
   readonly heroImage = signal<string>(this.images.hero);
 
   private loadHeroImage(): void {
@@ -143,11 +135,6 @@ export class ContentService {
     { id: 'espanol', label: 'Español', flag: '🇪🇸' },
   ];
 
-  // -------------------------------------------------------------------
-  // Cursos: ya NO viven hardcodeados acá. Se traen del CRM al arrancar
-  // la app (loadCourses) y se exponen como signal para que las tarjetas
-  // se actualicen solas en cuanto llega la respuesta.
-  // -------------------------------------------------------------------
   readonly courses = signal<Course[]>([]);
   readonly coursesLoading = signal<boolean>(true);
   readonly coursesError = signal<boolean>(false);
@@ -177,10 +164,6 @@ export class ContentService {
     if (normalized.includes('ingl')) return 'ingles';
     if (normalized.includes('espa')) return 'espanol';
 
-    // Si la categoría del CRM no calza con ninguno de los 3 idiomas
-    // (por ejemplo, si course_categories todavía no tiene "Francés",
-    // "Inglés" y "Español" creadas), cae en 'frances' por defecto y
-    // avisa por consola para que se revise en el CRM.
     console.warn(
       `[La Profe Chris] Categoría "${categoria}" no se reconoce como idioma. ` +
       `Revisa que exista una categoría en course_categories llamada ` +
@@ -189,7 +172,7 @@ export class ContentService {
     return 'frances';
   }
 
-  /** Arma la URL completa de una imagen guardada en S3. */
+
   resolveImageUrl(path: string | undefined): string {
     if (!path) return this.images.hero;
     if (path.startsWith('http')) return path;
@@ -202,22 +185,13 @@ export class ContentService {
     return {
       language,
       slug: item.slug,
-      // 'level' y 'weeks' no existen todavía como columnas en la tabla
-      // 'productos' del CRM. Mientras tanto usamos el tipo de producto
-      // (Curso/Diplomado) como aproximación. Si quieres mostrar el nivel
-      // real (Principiante/Intermedio/Avanzado) y la duración en semanas,
-      // agrega columnas 'nivel' y 'duracion' en 'productos' y mapéalas
-      // aquí igual que 'tipo'.
-      level: item.tipo ?? '',
+      
+      level: item.nivel ?? '',
       badgeColor: LANGUAGE_BADGE_COLOR[language],
       title: item.nombre,
       price: `S/. ${Number(item.precio).toFixed(2)}`,
-      // El teaser corto ('text') no viene en el listado (solo en el
-      // detalle, como 'descripcion'), así que se completa al entrar al
-      // detalle del curso. Aquí queda vacío para no pegarle un fetch
-      // extra a cada tarjeta.
-      text: '',
-      weeks: '',
+      text: item.resumen_corto ?? '',
+      weeks: item.duracion_semanas ? `${item.duracion_semanas} Semanas` : '',
       img: this.resolveImageUrl(item.portada_url),
     };
   }
