@@ -1,0 +1,148 @@
+.register-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 31, 58, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 200;
+}
+
+.register-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 26px 26px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+
+.register-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-surface-container-low, #f0f2f5);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.register-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.register-modal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-on-surface);
+  margin: 0 0 6px;
+}
+
+.register-modal-subtitle {
+  color: var(--color-on-surface-variant);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.register-form-row .register-field {
+  flex: 1;
+}
+
+.register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.register-field-input {
+  border: 1.5px solid var(--color-outline-variant, #d0d5dd);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+}
+
+.register-field-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.register-field-error {
+  font-size: 0.75rem;
+  color: #d64545;
+}
+
+.register-modal-alert {
+  background: rgba(214, 69, 69, 0.08);
+  border: 1px solid rgba(214, 69, 69, 0.3);
+  color: #a02f2f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+
+.register-submit-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 13px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.register-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: register-spin 0.6s linear infinite;
+}
+
+@keyframes register-spin {
+  to { transform: rotate(360deg); }
+}

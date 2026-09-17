@@ -180,22 +180,25 @@ export class ContentService {
     return `${environment.storageBaseUrl}${separator}${path}`;
   }
 
-  private mapListItemToCourse(item: CrmCourseListItem): Course {
-    const language = this.mapCategoryToLanguage(item.categoria);
-    return {
-      language,
-      slug: item.slug,
-      
-      level: item.nivel ?? '',
-      badgeColor: LANGUAGE_BADGE_COLOR[language],
-      title: item.nombre,
-      price: `S/. ${Number(item.precio).toFixed(2)}`,
-      text: item.resumen_corto ?? '',
-      weeks: item.duracion_semanas ? `${item.duracion_semanas} Semanas` : '',
-      img: this.resolveImageUrl(item.portada_url),
-    };
-  }
+ private mapListItemToCourse(item: CrmCourseListItem): Course {
+  const language = this.mapCategoryToLanguage(item.categoria);
+  return {
+    language,
+    slug: item.slug,
+    level: item.nivel ?? '',
+    badgeColor: LANGUAGE_BADGE_COLOR[language],
+    title: item.nombre,
+    price: `S/. ${Number(item.precio).toFixed(2)}`,
+    text: item.resumen_corto ?? '',
+    weeks: item.duracion_semanas ? `${item.duracion_semanas} Semanas` : '',
+    img: this.resolveImageUrl(item.portada_url),
 
+    // NUEVOS: necesarios para el botón "Comprar"
+    id: item.id,
+    tipoProductoId: item.tipo_producto_id,
+    precioNumerico: Number(item.precio),
+  };
+}
   readonly testimonials: Testimonial[] = [
     {
       text: 'Increíble. Pasé de no entender nada a poder tener conversaciones fluidas en mi viaje a Lyon. Chris hace que todo parezca fácil.',

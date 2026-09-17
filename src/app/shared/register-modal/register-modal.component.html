@@ -1,0 +1,64 @@
+<div class="register-modal-overlay" (click)="close()">
+  <div class="register-modal" (click)="$event.stopPropagation()">
+
+    <button class="register-modal-close" (click)="close()" aria-label="Cerrar" [disabled]="submitting()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+
+    <p class="register-modal-title">Crea tu cuenta</p>
+    <p class="register-modal-subtitle">
+      Con estos datos creamos tu acceso al aula virtual. Te enviaremos tu usuario y contraseña por correo.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="register-form" novalidate>
+
+      <div class="register-form-row">
+        <label class="register-field">
+          <span class="register-field-label">Nombre</span>
+          <input type="text" formControlName="nombre" class="register-field-input" placeholder="Ej. María" />
+        </label>
+
+        <label class="register-field">
+          <span class="register-field-label">Apellido</span>
+          <input type="text" formControlName="apellido" class="register-field-input" placeholder="Ej. García" />
+        </label>
+      </div>
+
+      <label class="register-field">
+        <span class="register-field-label">DNI</span>
+        <input type="text" formControlName="dni" class="register-field-input" placeholder="8 dígitos" maxlength="8" />
+        <span class="register-field-error" *ngIf="form.get('dni')?.invalid && form.get('dni')?.touched">
+          Ingresa un DNI válido (8 dígitos).
+        </span>
+      </label>
+
+      <label class="register-field">
+        <span class="register-field-label">Correo electrónico</span>
+        <input type="email" formControlName="email" class="register-field-input" placeholder="tucorreo@ejemplo.com" />
+        <span class="register-field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          Ingresa un correo válido.
+        </span>
+      </label>
+
+      <label class="register-field">
+        <span class="register-field-label">Número de celular</span>
+        <input type="tel" formControlName="celular" class="register-field-input" placeholder="9XXXXXXXX" maxlength="9" />
+        <span class="register-field-error" *ngIf="form.get('celular')?.invalid && form.get('celular')?.touched">
+          Ingresa un celular válido (9 dígitos, empieza con 9).
+        </span>
+      </label>
+
+      <div class="register-modal-alert" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
+      <button type="submit" class="register-submit-btn" [disabled]="submitting()">
+        <span class="register-spinner" *ngIf="submitting()"></span>
+        {{ submitting() ? 'Creando cuenta...' : 'Continuar al pago' }}
+      </button>
+    </form>
+
+  </div>
+</div>

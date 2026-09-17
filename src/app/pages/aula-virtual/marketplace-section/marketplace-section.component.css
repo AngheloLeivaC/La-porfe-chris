@@ -12,22 +12,25 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 24px;
+  overflow: visible;
 }
 
 /* ---------- Tarjeta ---------- */
 .marketplace-card {
+  position: relative;
   background: #ffffff;
   border-radius: 20px;
-  overflow: hidden;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 10px rgba(16, 24, 40, 0.06);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .marketplace-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 32px rgba(16, 24, 40, 0.14);
+  z-index: 30;
 }
 
 .marketplace-card--purchased {
@@ -41,6 +44,8 @@
   height: 170px;
   overflow: hidden;
   background: var(--color-surface-container);
+  border-radius: 20px 20px 0 0;
+  cursor: pointer;
 }
 
 .marketplace-thumb img {
@@ -107,6 +112,41 @@
   font-weight: 700;
 }
 
+/* ---------- Overlay "Vista rápida" (hover sobre la imagen) ---------- */
+.marketplace-quickview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 31, 58, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.marketplace-card:hover .marketplace-quickview-overlay {
+  background: rgba(11, 31, 58, 0.35);
+  opacity: 1;
+}
+
+.marketplace-quickview-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: var(--color-on-surface);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transform: translateY(6px);
+  transition: transform 0.2s ease;
+}
+
+.marketplace-card:hover .marketplace-quickview-pill {
+  transform: translateY(0);
+}
+
 /* ---------- Cuerpo ---------- */
 .marketplace-body {
   padding: 18px 18px 20px;
@@ -148,12 +188,14 @@
   font-family: var(--font-display);
 }
 
-/* ---------- Botón ---------- */
+/* ---------- Botón de compra ---------- */
 .marketplace-btn {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   border: none;
   border-radius: 999px;
-  padding: 11px;
+  padding: 12px;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.85rem;
@@ -163,53 +205,48 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+/* Efecto de "brillo" que cruza el botón al pasar el mouse */
+.marketplace-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+  pointer-events: none;
+}
+
+.marketplace-btn:hover:not(:disabled)::after {
+  left: 130%;
 }
 
 .marketplace-btn:hover:not(:disabled) {
-  opacity: 0.94;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+  transform: translateY(-2px);
+}
+
+.marketplace-btn-cart {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.marketplace-btn:hover:not(:disabled) .marketplace-btn-cart {
+  transform: scale(1.15) rotate(-6deg);
 }
 
 .marketplace-btn:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.marketplace-btn-arrow {
-  transition: transform 0.2s ease;
-}
-
-.marketplace-btn:hover:not(:disabled) .marketplace-btn-arrow {
-  transform: translateX(3px);
-}
-
 .marketplace-btn:disabled {
   cursor: not-allowed;
   opacity: 0.75;
-}
-
-.marketplace-btn-stripe {
-  width: 100%;
-  border: 1.5px solid var(--color-outline-variant, #d0d5dd);
-  background: transparent;
-  color: var(--color-on-surface-variant);
-  border-radius: 999px;
-  padding: 9px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.marketplace-btn-stripe:hover:not(:disabled) {
-  background: var(--color-surface-container-low, #f7f9fb);
-  border-color: var(--color-on-surface-variant);
-}
-
-.marketplace-btn-stripe:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .marketplace-btn--purchased {
@@ -225,49 +262,15 @@
   animation: marketplace-spin 0.6s linear infinite;
 }
 
+.marketplace-spinner--dark {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--color-primary);
+}
+
 @keyframes marketplace-spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* ---------- Overlay "Vista rápida" (aparece al hover sobre la imagen) ---------- */
-.marketplace-thumb {
-  cursor: pointer;
-}
-
-.marketplace-quickview-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(11, 31, 58, 0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease, background 0.2s ease;
-}
-
-.marketplace-card:hover .marketplace-quickview-overlay {
-  background: rgba(11, 31, 58, 0.35);
-  opacity: 1;
-}
-
-.marketplace-quickview-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  color: var(--color-on-surface);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  transform: translateY(6px);
-  transition: transform 0.2s ease;
-}
-
-.marketplace-card:hover .marketplace-quickview-pill {
-  transform: translateY(0);
 }
 
 /* ---------- Modal de vista rápida ---------- */
@@ -332,7 +335,6 @@
   transform: scale(1.08);
 }
 
-/* Columna izquierda: imagen fija en toda la altura del modal */
 .quickview-thumb {
   position: relative;
   height: 100%;
@@ -347,7 +349,6 @@
   object-fit: cover;
 }
 
-/* Columna derecha: contenido con scroll propio + CTA fija abajo */
 .quickview-content {
   display: flex;
   flex-direction: column;
@@ -381,11 +382,6 @@
   gap: 8px;
   font-size: 0.85rem;
   color: var(--color-on-surface-variant);
-}
-
-.marketplace-spinner--dark {
-  border-color: rgba(0, 0, 0, 0.15);
-  border-top-color: var(--color-primary);
 }
 
 .quickview-modules-title {
@@ -442,7 +438,6 @@
   line-height: 1.4;
 }
 
-/* CTA fija abajo, siempre visible aunque el temario tenga scroll */
 .quickview-cta {
   padding: 16px 26px 22px;
   border-top: 1px solid var(--color-surface-container-low, #f0f2f5);
@@ -460,4 +455,215 @@
   .quickview-content {
     max-height: 70vh;
   }
+}
+
+/* ---------- Encabezado con botón de carrito ---------- */
+.marketplace-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cart-fab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--color-outline-variant, #d0d5dd);
+  background: #ffffff;
+  color: var(--color-on-surface);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cart-fab:hover {
+  background: var(--color-surface-container-low, #f7f9fb);
+  border-color: var(--color-primary);
+}
+
+.cart-fab-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #dc3545;
+  color: #ffffff;
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0 4px;
+}
+
+/* ---------- Botón "Agregar al carrito" (debajo del botón de compra) ---------- */
+.cart-toggle-btn {
+  width: 100%;
+  margin-top: 8px;
+  border: 1.5px solid var(--color-outline-variant, #d0d5dd);
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  border-radius: 999px;
+  padding: 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cart-toggle-btn:hover {
+  background: var(--color-surface-container-low, #f7f9fb);
+  border-color: var(--color-on-surface-variant);
+}
+
+.cart-toggle-btn--active {
+  background: rgba(25, 135, 84, 0.08);
+  border-color: #198754;
+  color: #198754;
+}
+
+/* ---------- Panel del carrito ---------- */
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 31, 58, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 110;
+  animation: quickview-fade-in 0.18s ease;
+}
+
+.cart-panel {
+  width: 100%;
+  max-width: 380px;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.2);
+  animation: cart-slide-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes cart-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.cart-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--color-surface-container-low, #f0f2f5);
+}
+
+.cart-panel-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+  color: var(--color-on-surface);
+}
+
+.cart-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--color-surface-container-low, #f0f2f5);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-name {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item-price {
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+}
+
+.cart-item-remove {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 999px;
+}
+
+.cart-item-remove:hover {
+  background: rgba(214, 69, 69, 0.1);
+  color: #a02f2f;
+}
+
+.cart-panel-footer {
+  padding: 16px 20px 22px;
+  border-top: 1px solid var(--color-surface-container-low, #f0f2f5);
+}
+
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.cart-total-amount {
+  font-size: 1.2rem;
+  font-family: var(--font-display);
+}
+
+.cart-checkout-btn {
+  background: var(--color-primary);
 }

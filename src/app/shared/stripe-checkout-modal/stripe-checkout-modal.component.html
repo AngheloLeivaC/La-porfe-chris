@@ -1,0 +1,47 @@
+<div class="stripe-modal-overlay" (click)="close()">
+  <div class="stripe-modal" (click)="$event.stopPropagation()">
+
+    <button class="stripe-modal-close" (click)="close()" aria-label="Cerrar" [disabled]="submitting()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+
+    <div *ngIf="paidSuccessfully()" class="stripe-modal-success">
+      <div class="stripe-success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </div>
+      <p class="stripe-success-title">¡Pago realizado!</p>
+      <p class="stripe-success-text">Tu curso ya está disponible en "Mis Cursos".</p>
+    </div>
+
+    <ng-container *ngIf="!paidSuccessfully()">
+      <p class="stripe-modal-title">Pagar con tarjeta</p>
+      <p class="stripe-modal-subtitle" *ngIf="totalLabel">Total a pagar: <strong>{{ totalLabel }}</strong></p>
+
+      <div *ngIf="loadingForm()" class="stripe-modal-loading">
+        <span class="stripe-spinner"></span>
+        Cargando formulario de pago...
+      </div>
+
+      <div #paymentElementRef class="stripe-payment-element" [class.stripe-hidden]="loadingForm()"></div>
+
+      <div *ngIf="errorMessage()" class="stripe-modal-alert">
+        {{ errorMessage() }}
+      </div>
+
+      <button
+        class="stripe-pay-btn"
+        *ngIf="!loadingForm()"
+        [disabled]="submitting()"
+        (click)="pagar()"
+      >
+        <span class="stripe-spinner" *ngIf="submitting()"></span>
+        {{ submitting() ? 'Procesando...' : 'Confirmar pago' }}
+      </button>
+    </ng-container>
+
+  </div>
+</div>

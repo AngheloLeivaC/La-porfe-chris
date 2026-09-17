@@ -34,6 +34,9 @@ export interface Course {
   certificateText?: string;
   includes?: string[]; // checklist tipo "Acceso de por vida al contenido"
   modules?: CourseModule[]; // temario expandible (Módulo 1, 2, 3...)
+  id?: number;
+  tipoProductoId?: number;
+  precioNumerico?: number;
 }
 
 export interface Testimonial {
@@ -149,4 +152,14 @@ export interface ActivityItem {
   due_date: string;
   course_name: string | null;
   completed: boolean;
+}
+export interface DocumentTypeItem {
+  id: number;
+  name: string;
+}
+
+export interface RegisterAcademyUserResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: { id: number; name: string; email: string } | null;
 }

@@ -1,5 +1,19 @@
-<h1 class="aula-title">Marketplace</h1>
-<p class="aula-subtitle">Explora todos nuestros cursos y adquiere el que necesites.</p>
+<div class="marketplace-header">
+  <div>
+    <h1 class="aula-title">Marketplace</h1>
+    <p class="aula-subtitle">Explora todos nuestros cursos y adquiere el que necesites.</p>
+  </div>
+
+  <button class="cart-fab" (click)="openCartPanel()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+    Carrito
+    <span class="cart-fab-badge" *ngIf="cart.count > 0">{{ cart.count }}</span>
+  </button>
+</div>
 
 <div *ngIf="loading()" class="aula-state">Cargando cursos...</div>
 
@@ -16,7 +30,7 @@
   <button
     class="marketplace-btn"
     [class.marketplace-btn--purchased]="isPurchased(course)"
-    [style.background]="isPurchased(course) ? '' : badgeColor(course)"
+    [style.background]="isPurchased(course) ? '' : buttonGradient(course)"
     [disabled]="isPurchasing(course) || isPurchased(course)"
     (click)="comprar(course)"
   >
@@ -33,20 +47,13 @@
     </ng-container>
 
     <ng-container *ngIf="!isPurchased(course) && !isPurchasing(course)">
-      Comprar curso
-      <svg class="marketplace-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14M13 6l6 6-6 6" />
+      <svg class="marketplace-btn-cart" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1" />
+        <circle cx="20" cy="21" r="1" />
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
       </svg>
+      Comprar curso
     </ng-container>
-  </button>
-
-  <button
-    *ngIf="!isPurchased(course)"
-    class="marketplace-btn-stripe"
-    [disabled]="isPurchasing(course)"
-    (click)="pagarConStripe(course)"
-  >
-    O pagar con tarjeta (Stripe)
   </button>
 </ng-template>
 
@@ -93,6 +100,23 @@
       </div>
 
       <ng-container *ngTemplateOutlet="buyButtonTpl; context: { course: course }"></ng-container>
+
+      <button
+        class="cart-toggle-btn"
+        [class.cart-toggle-btn--active]="cart.isInCart(course.id)"
+        *ngIf="!isPurchased(course)"
+        (click)="toggleCart(course)"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <ng-container *ngIf="!cart.isInCart(course.id)">
+            <path d="M12 5v14M5 12h14" />
+          </ng-container>
+          <ng-container *ngIf="cart.isInCart(course.id)">
+            <path d="M20 6 9 17l-5-5" />
+          </ng-container>
+        </svg>
+        {{ cart.isInCart(course.id) ? 'En el carrito' : 'Agregar al carrito' }}
+      </button>
     </div>
   </div>
 </div>
@@ -107,7 +131,6 @@
       </svg>
     </button>
 
-    <!-- Columna izquierda: imagen fija -->
     <div class="quickview-thumb">
       <img [src]="courseImage(course)" [alt]="course.nombre" />
       <span class="marketplace-badge" [style.background]="badgeColor(course)">
@@ -117,7 +140,6 @@
       <span class="marketplace-type-tag" *ngIf="course.tipo">{{ course.tipo }}</span>
     </div>
 
-    <!-- Columna derecha: contenido con scroll + CTA fija abajo -->
     <div class="quickview-content">
 
       <div class="quickview-scroll">
@@ -164,3 +186,59 @@
     </div>
   </div>
 </div>
+
+<!-- Panel del carrito -->
+<div class="cart-overlay" *ngIf="cartOpen()" (click)="closeCartPanel()">
+  <div class="cart-panel" (click)="$event.stopPropagation()">
+
+    <div class="cart-panel-header">
+      <p class="cart-panel-title">Tu carrito</p>
+      <button class="quickview-close" (click)="closeCartPanel()" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="cart-empty" *ngIf="cart.count === 0">
+      Todavía no agregaste ningún curso al carrito.
+    </div>
+
+    <div class="cart-items" *ngIf="cart.count > 0">
+      <div class="cart-item" *ngFor="let item of cart.items()">
+        <img class="cart-item-thumb" [src]="courseImage(item)" [alt]="item.nombre" />
+        <div class="cart-item-info">
+          <p class="cart-item-name">{{ item.nombre }}</p>
+          <span class="cart-item-price">S/ {{ priceLabel(item) }}</span>
+        </div>
+        <button class="cart-item-remove" (click)="removeFromCart(item.id)" aria-label="Quitar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cart-panel-footer" *ngIf="cart.count > 0">
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span class="cart-total-amount">S/ {{ cart.total.toFixed(2) }}</span>
+      </div>
+
+      <button class="marketplace-btn cart-checkout-btn" [disabled]="cartCheckingOut()" (click)="checkoutCart()">
+        <span class="marketplace-spinner" *ngIf="cartCheckingOut()"></span>
+        {{ cartCheckingOut() ? 'Procesando...' : 'Finalizar compra' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de pago embebido (Stripe Elements) -->
+<app-stripe-checkout-modal
+  *ngIf="payingItems() as items"
+  [userId]="auth.currentUser()?.id ?? 0"
+  [items]="items"
+  [totalLabel]="payingTotalLabel()"
+  (closed)="closePaymentModal()"
+  (success)="onPaymentSuccess()"
+></app-stripe-checkout-modal>

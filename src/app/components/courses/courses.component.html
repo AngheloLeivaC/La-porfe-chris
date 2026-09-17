@@ -1,80 +1,113 @@
-<section id="cursos" class="courses">
-  <div class="container">
-    <div class="courses-lang-row" appScrollReveal>
-      <p class="courses-eyebrow">Nuestros Programas</p>
-      <div class="courses-lang-tabs" role="tablist" aria-label="Elegir idioma">
-        <button
-          type="button"
-          *ngFor="let tab of content.languageTabs"
-          class="courses-lang-tab"
-          [class.active]="selectedLanguage === tab.id"
-          role="tab"
-          [attr.aria-selected]="selectedLanguage === tab.id"
-          (click)="selectLanguage(tab.id)"
-        >
-          <span class="courses-lang-flag" aria-hidden="true">{{ tab.flag }}</span>
-          {{ tab.label }}
-        </button>
-      </div>
-    </div>
+<section id="cursos" class="courses-section container">
+  <p class="section-eyebrow">NUESTROS PROGRAMAS</p>
 
-    <div class="courses-header">
-      <h2 class="courses-title">{{ sectionTitle }}</h2>
-      <a href="#cursos" class="courses-link">
-        Ver todos los niveles
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="13 17 18 12 13 7" />
-          <polyline points="6 17 11 12 6 7" />
-        </svg>
-      </a>
-    </div>
+  <div class="language-tabs">
+    <button
+      *ngFor="let tab of content.languageTabs"
+      class="language-tab"
+      [class.language-tab--active]="selectedLanguage === tab.id"
+      (click)="setLanguage(tab.id)"
+    >
+      {{ tab.flag }} {{ tab.label }}
+    </button>
+  </div>
 
-    <div class="courses-grid" *ngIf="loading">
-      <p class="courses-loading">Cargando cursos...</p>
-    </div>
+  <div class="courses-header-row">
+    <h2 class="courses-title">Encuentra el nivel perfecto para tu aventura</h2>
+  </div>
 
-    <div class="courses-grid" *ngIf="!loading && loadError">
-      <p class="courses-loading">
-        No pudimos cargar los cursos en este momento. Intenta recargar la página.
-      </p>
-    </div>
+  <div *ngIf="loading" class="courses-state">Cargando cursos...</div>
+  <div *ngIf="!loading && loadError" class="courses-state">No pudimos cargar los cursos.</div>
 
-    <div class="courses-grid" *ngIf="!loading && !loadError && filteredCourses.length; else sinCursos">
-      <div
-        class="course-card"
-        *ngFor="let c of filteredCourses; let i = index"
-        appScrollReveal
-        [revealDelay]="i * 120"
-      >
-        <div class="course-image-wrap">
-          <img [src]="c.img" [alt]="c.title" class="course-image" />
-          <div class="course-badge" [style.background]="c.badgeColor">{{ c.level }}</div>
+  <div *ngIf="!loading && !loadError && filteredCourses.length" class="courses-carousel">
+    <button
+      type="button"
+      class="courses-nav courses-nav--prev"
+      *ngIf="hasOverflow()"
+      [disabled]="atStart()"
+      (click)="scroll(-1)"
+      aria-label="Ver cursos anteriores"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+    </button>
+
+    <div class="courses-grid" #track (scroll)="updateScrollState()">
+      <div class="course-card" *ngFor="let c of filteredCourses">
+        <div class="course-thumb">
+          <img [src]="c.img" [alt]="c.title" />
+          <span class="course-badge" [style.background]="c.badgeColor" *ngIf="c.level">{{ c.level }}</span>
         </div>
+
         <div class="course-body">
           <div class="course-title-row">
-            <h4 class="course-title">{{ c.title }}</h4>
+            <h3 class="course-title">{{ c.title }}</h3>
             <span class="course-price">{{ c.price }}</span>
           </div>
-          <p class="course-text">{{ c.text }}</p>
-          <hr class="course-divider" />
+
+          <p class="course-text" *ngIf="c.text">{{ c.text }}</p>
+
           <div class="course-footer">
-            <div class="course-weeks">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <span class="course-weeks" *ngIf="c.weeks">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 16 14" />
+                <path d="M12 7v5l3 3" />
               </svg>
               {{ c.weeks }}
+            </span>
+
+            <div class="course-actions">
+              <a [routerLink]="['/curso', c.language, c.slug]" class="course-more-btn">Más Info</a>
+              <button class="course-buy-btn" (click)="comprar(c)">Comprar</button>
             </div>
-            <a [routerLink]="['/curso', c.language, c.slug]" class="btn-small">Más Info</a>
           </div>
         </div>
       </div>
     </div>
 
-    <ng-template #sinCursos>
-      <div class="courses-empty">
-        <p>Próximamente vamos a agregar cursos en este idioma. ¡Vuelve pronto! 🎉</p>
-      </div>
-    </ng-template>
+    <span class="courses-fade courses-fade--left" [class.is-visible]="hasOverflow() && !atStart()"></span>
+    <span class="courses-fade courses-fade--right" [class.is-visible]="hasOverflow() && !atEnd()"></span>
+
+    <button
+      type="button"
+      class="courses-nav courses-nav--next"
+      *ngIf="hasOverflow()"
+      [disabled]="atEnd()"
+      (click)="scroll(1)"
+      aria-label="Ver más cursos"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6" />
+      </svg>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !loadError && !filteredCourses.length" class="courses-empty">
+    Próximamente vamos a agregar cursos en este idioma. ¡Vuelve pronto! 🎉
   </div>
 </section>
+
+<!-- Aviso de compra exitosa -->
+<div class="purchase-success-banner" *ngIf="purchaseDone()">
+  <p>¡Listo! Revisa tu correo — te enviamos tu usuario y contraseña para entrar al Aula Virtual.</p>
+  <a routerLink="/login" class="purchase-success-link">Ir a iniciar sesión →</a>
+  <button class="purchase-success-close" (click)="purchaseDone.set(false)" aria-label="Cerrar">✕</button>
+</div>
+
+<!-- Paso 1: registro -->
+<app-register-modal
+  *ngIf="buyingCourse() && !registeredUser()"
+  (closed)="closeBuyFlow()"
+  (registered)="onRegistered($event)"
+></app-register-modal>
+
+<!-- Paso 2: pago -->
+<app-stripe-checkout-modal
+  *ngIf="registeredUser() as user"
+  [userId]="user.id"
+  [items]="paymentItems"
+  [totalLabel]="paymentTotalLabel"
+  (closed)="closeBuyFlow()"
+  (success)="onPaymentSuccess()"
+></app-stripe-checkout-modal>

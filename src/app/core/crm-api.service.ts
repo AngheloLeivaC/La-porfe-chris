@@ -10,6 +10,9 @@ import {
   LoginEnvelope,
   PurchasedCourse,
   ActivityItem,
+   DocumentTypeItem,
+    RegisterAcademyUserResponse,
+
 } from './models';
 
 /**
@@ -109,11 +112,43 @@ export class CrmApiService {
   /** Crea una sesión de pago de Stripe y devuelve la URL a la que redirigir. */
   createStripeCheckoutSession(
     userId: number,
-    productId: number
+    items: { product_id: number; product_type: number }[]
   ): Observable<{ url: string }> {
     return this.http.post<{ url: string }>(
       `${this.baseUrl}/payments/stripe/create-checkout-session`,
-      { user_id: userId, product_id: productId }
+      { user_id: userId, items }
     );
   }
+
+  createStripePaymentIntent(
+    userId: number,
+    items: { product_id: number; product_type: number }[]
+  ): Observable<{ clientSecret: string }> {
+    return this.http.post<{ clientSecret: string }>(
+      `${this.baseUrl}/payments/stripe/create-payment-intent`,
+      { user_id: userId, items }
+    );
+  }
+
+  
+listDocumentTypes(): Observable<DocumentTypeItem[]> {
+  return this.http.get<DocumentTypeItem[]>(`${this.baseUrl}/public/listDocumentType`);
+}
+
+registerAcademyUser(payload: {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  doc_type_id: number | null;
+  number_doc: string;
+  country: string;
+  birthday: string;
+}): Observable<RegisterAcademyUserResponse> {
+  return this.http.post<RegisterAcademyUserResponse>(
+    `${this.baseUrl}/public/registerAcademyUser`,
+    payload
+  );
+}
+
 }

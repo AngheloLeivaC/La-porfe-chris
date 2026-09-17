@@ -1,11 +1,14 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
 import { CrmApiService } from '../../../core/crm-api.service';
 import { AuthService } from '../../../core/auth.service';
-import { CulqiService } from '../../../core/culqi.service';
+import { CartService } from '../../../core/cart.service';
 import { CrmCourseListItem } from '../../../core/models';
 import { environment } from '../../../../environments/environment';
+import {
+  StripeCheckoutModalComponent,
+  StripeCartItem,
+} from '../../../shared/stripe-checkout-modal/stripe-checkout-modal.component';
 
 // Paleta fija: cada categoría recibe un color consistente según su nombre,
 // sin depender de que el CRM defina un color (no existe esa columna).
@@ -32,7 +35,7 @@ interface QuickViewInfo {
 @Component({
   selector: 'app-marketplace-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StripeCheckoutModalComponent],
   templateUrl: './marketplace-section.component.html',
   styleUrl: './marketplace-section.component.css',
 })
@@ -41,21 +44,24 @@ export class MarketplaceSectionComponent implements OnInit {
   readonly loading = signal(true);
   readonly loadError = signal(false);
 
-  // ids de cursos con una compra en curso (para deshabilitar SOLO esa tarjeta)
   readonly purchasingIds = signal<Set<number>>(new Set());
   readonly purchasedIds = signal<Set<number>>(new Set());
   readonly errorMessage = signal<string | null>(null);
 
-  // "Vista rápida": se abre con CLIC en la imagen (no con hover, eso ya se
-  // revirtió antes). El detalle se carga una sola vez por curso y queda
-  // en caché para no repetir la petición si se vuelve a abrir.
   readonly quickViewCourse = signal<CrmCourseListItem | null>(null);
   readonly quickViewDetails = signal<Record<number, QuickViewInfo>>({});
 
+  readonly cartOpen = signal(false);
+  readonly cartCheckingOut = signal(false);
+
+  // Modal de pago embebido (Stripe Elements)
+  readonly payingItems = signal<StripeCartItem[] | null>(null);
+  readonly payingTotalLabel = signal('');
+
   constructor(
     private crmApi: CrmApiService,
-    private auth: AuthService,
-    private culqi: CulqiService
+    public auth: AuthService,
+    public cart: CartService
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +88,21 @@ export class MarketplaceSectionComponent implements OnInit {
     return colorForCategory(course.categoria);
   }
 
+  buttonGradient(course: CrmCourseListItem): string {
+    const color = this.badgeColor(course);
+    return `linear-gradient(135deg, ${color}, ${this.shade(color, -18)})`;
+  }
+
+  private shade(hex: string, percent: number): string {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const clamp = (v: number) => Math.max(0, Math.min(255, v));
+    const r = clamp((num >> 16) + amt);
+    const g = clamp(((num >> 8) & 0x00ff) + amt);
+    const b = clamp((num & 0x0000ff) + amt);
+    return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
+  }
+
   priceLabel(course: CrmCourseListItem): string {
     return Number(course.precio).toFixed(2);
   }
@@ -94,48 +115,16 @@ export class MarketplaceSectionComponent implements OnInit {
     return this.purchasedIds().has(course.id);
   }
 
-  async comprar(course: CrmCourseListItem): Promise<void> {
+  /** Compra directa e inmediata de UN solo curso (no pasa por el carrito). */
+  comprar(course: CrmCourseListItem): void {
     const user = this.auth.currentUser();
     if (!user) return;
 
     this.errorMessage.set(null);
-    this.setPurchasing(course.id, true);
-
-    try {
-      const amountInCents = Math.round(Number(course.precio) * 100);
-
-      // 1) Abre el widget de Culqi y obtiene el token de la tarjeta.
-      const { id: token, email } = await this.culqi.open(amountInCents, course.nombre);
-
-      // 2) Cobra el monto (mismo flujo/limitación de seguridad que Buy.vue).
-      const charge = await firstValueFrom(this.culqi.charge(amountInCents, email, token));
-
-      if (charge.outcome.type !== 'venta_exitosa') {
-        this.errorMessage.set('El pago fue rechazado por el banco.');
-        return;
-      }
-
-      // 3) Registra la compra en el CRM (otorga acceso al curso).
-      await firstValueFrom(
-        this.crmApi.savePayment({
-          user_id: user.id,
-          product_id: course.id,
-          amount: amountInCents,
-          reference_code: charge.reference_code,
-          product_type: course.tipo_producto_id,
-        })
-      );
-
-      this.purchasedIds.update((set) => new Set(set).add(course.id));
-    } catch (error: any) {
-      console.error(error);
-      const cancelled = error?.message === 'El pago fue cancelado.';
-      if (!cancelled) {
-        this.errorMessage.set('No se pudo completar la compra. Intenta nuevamente.');
-      }
-    } finally {
-      this.setPurchasing(course.id, false);
-    }
+    this.payingTotalLabel.set(`S/ ${this.priceLabel(course)}`);
+    this.payingItems.set([
+      { product_id: course.id, product_type: course.tipo_producto_id },
+    ]);
   }
 
   private setPurchasing(id: number, value: boolean): void {
@@ -147,32 +136,65 @@ export class MarketplaceSectionComponent implements OnInit {
     });
   }
 
-  pagarConStripe(course: CrmCourseListItem): void {
+  // ---------- Carrito ----------
+
+  toggleCart(course: CrmCourseListItem): void {
+    this.cart.toggle(course);
+  }
+
+  openCartPanel(): void {
+    this.cartOpen.set(true);
+  }
+
+  closeCartPanel(): void {
+    this.cartOpen.set(false);
+  }
+
+  removeFromCart(courseId: number): void {
+    this.cart.remove(courseId);
+  }
+
+  checkoutCart(): void {
     const user = this.auth.currentUser();
-    if (!user) return;
+    if (!user || this.cart.count === 0) return;
 
     this.errorMessage.set(null);
-    this.setPurchasing(course.id, true);
-
-    this.crmApi.createStripeCheckoutSession(user.id, course.id).subscribe({
-      next: ({ url }) => {
-        // Redirige a la página de pago de Stripe (hospedada por Stripe,
-        // no en nuestro sitio). El acceso al curso se otorga cuando
-        // Stripe llama al webhook del backend, no acá.
-        window.location.href = url;
-      },
-      error: () => {
-        this.errorMessage.set('No se pudo iniciar el pago con Stripe. Intenta nuevamente.');
-        this.setPurchasing(course.id, false);
-      },
-    });
+    this.payingTotalLabel.set(`S/ ${this.cart.total.toFixed(2)}`);
+    this.payingItems.set(
+      this.cart.items().map((c) => ({
+        product_id: c.id,
+        product_type: c.tipo_producto_id,
+      }))
+    );
+    this.closeCartPanel();
   }
+
+  onPaymentSuccess(): void {
+    const items = this.payingItems();
+    if (items) {
+      // Marca como comprados los cursos que se acaban de pagar, para que
+      // el botón cambie a "Comprado" sin esperar a recargar la página.
+      this.purchasedIds.update((set) => {
+        const next = new Set(set);
+        items.forEach((i) => next.add(i.product_id));
+        return next;
+      });
+      // Si venían del carrito, límpialo.
+      items.forEach((i) => this.cart.remove(i.product_id));
+    }
+    this.payingItems.set(null);
+  }
+
+  closePaymentModal(): void {
+    this.payingItems.set(null);
+  }
+
+  // ---------- Vista rápida ----------
 
   openQuickView(course: CrmCourseListItem): void {
     this.quickViewCourse.set(course);
     document.body.style.overflow = 'hidden';
 
-    // Ya se pidió antes -> no repetir la petición.
     if (this.quickViewDetails()[course.id]) return;
 
     this.quickViewDetails.update((map) => ({
@@ -210,6 +232,8 @@ export class MarketplaceSectionComponent implements OnInit {
   onEscapeKey(): void {
     if (this.quickViewCourse()) {
       this.closeQuickView();
+    } else if (this.cartOpen()) {
+      this.closeCartPanel();
     }
   }
 }
