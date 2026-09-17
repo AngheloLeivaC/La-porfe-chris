@@ -98,6 +98,7 @@
 <!-- Paso 1: registro -->
 <app-register-modal
   *ngIf="buyingCourse() && !registeredUser()"
+  [course]="buyingCourse()"
   (closed)="closeBuyFlow()"
   (registered)="onRegistered($event)"
 ></app-register-modal>
@@ -108,6 +109,7 @@
   [userId]="user.id"
   [items]="paymentItems"
   [totalLabel]="paymentTotalLabel"
+  [itemLabel]="buyingCourse()?.title ?? ''"
   (closed)="closeBuyFlow()"
   (success)="onPaymentSuccess()"
 ></app-stripe-checkout-modal>

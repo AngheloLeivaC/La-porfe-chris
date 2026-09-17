@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CrmApiService } from '../../core/crm-api.service';
+import { Course } from '../../core/models';
 
 export interface RegisteredUser {
   id: number;
@@ -17,6 +18,7 @@ export interface RegisteredUser {
   styleUrl: './register-modal.component.css',
 })
 export class RegisterModalComponent implements OnInit {
+  @Input() course: Course | null = null;
   @Output() closed = new EventEmitter<void>();
   @Output() registered = new EventEmitter<RegisteredUser>();
 

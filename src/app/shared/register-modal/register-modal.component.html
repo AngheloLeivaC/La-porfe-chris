@@ -7,28 +7,78 @@
       </svg>
     </button>
 
+    <div class="register-modal-steps">
+      <span class="register-step register-step--active">1</span>
+      <span class="register-step-line"></span>
+      <span class="register-step">2</span>
+      <span class="register-step-label">Paso 1 de 2 · Tus datos</span>
+    </div>
+
     <p class="register-modal-title">Crea tu cuenta</p>
     <p class="register-modal-subtitle">
       Con estos datos creamos tu acceso al aula virtual. Te enviaremos tu usuario y contraseña por correo.
     </p>
+
+    <div class="register-order-summary" *ngIf="course as c">
+      <img [src]="c.img" [alt]="c.title" class="register-order-thumb" />
+      <div class="register-order-info">
+        <span class="register-order-label">Estás inscribiéndote a</span>
+        <span class="register-order-title">{{ c.title }}</span>
+      </div>
+      <span class="register-order-price">{{ c.price }}</span>
+    </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="register-form" novalidate>
 
       <div class="register-form-row">
         <label class="register-field">
           <span class="register-field-label">Nombre</span>
-          <input type="text" formControlName="nombre" class="register-field-input" placeholder="Ej. María" />
+          <span class="register-field-input-wrap">
+            <svg class="register-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" />
+            </svg>
+            <input
+              type="text"
+              formControlName="nombre"
+              class="register-field-input"
+              placeholder="Ej. María"
+              [class.register-field-input--invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+            />
+          </span>
         </label>
 
         <label class="register-field">
           <span class="register-field-label">Apellido</span>
-          <input type="text" formControlName="apellido" class="register-field-input" placeholder="Ej. García" />
+          <span class="register-field-input-wrap">
+            <svg class="register-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" />
+            </svg>
+            <input
+              type="text"
+              formControlName="apellido"
+              class="register-field-input"
+              placeholder="Ej. García"
+              [class.register-field-input--invalid]="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+            />
+          </span>
         </label>
       </div>
 
       <label class="register-field">
         <span class="register-field-label">DNI</span>
-        <input type="text" formControlName="dni" class="register-field-input" placeholder="8 dígitos" maxlength="8" />
+        <span class="register-field-input-wrap">
+          <svg class="register-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 15h4M7 11h.01" /><circle cx="15.5" cy="11" r="1.5" />
+          </svg>
+          <input
+            type="text"
+            formControlName="dni"
+            class="register-field-input"
+            placeholder="8 dígitos"
+            maxlength="8"
+            [class.register-field-input--invalid]="form.get('dni')?.invalid && form.get('dni')?.touched"
+          />
+        </span>
         <span class="register-field-error" *ngIf="form.get('dni')?.invalid && form.get('dni')?.touched">
           Ingresa un DNI válido (8 dígitos).
         </span>
@@ -36,7 +86,18 @@
 
       <label class="register-field">
         <span class="register-field-label">Correo electrónico</span>
-        <input type="email" formControlName="email" class="register-field-input" placeholder="tucorreo@ejemplo.com" />
+        <span class="register-field-input-wrap">
+          <svg class="register-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" />
+          </svg>
+          <input
+            type="email"
+            formControlName="email"
+            class="register-field-input"
+            placeholder="tucorreo@ejemplo.com"
+            [class.register-field-input--invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          />
+        </span>
         <span class="register-field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
           Ingresa un correo válido.
         </span>
@@ -44,7 +105,19 @@
 
       <label class="register-field">
         <span class="register-field-label">Número de celular</span>
-        <input type="tel" formControlName="celular" class="register-field-input" placeholder="9XXXXXXXX" maxlength="9" />
+        <span class="register-field-input-wrap">
+          <svg class="register-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" /><path d="M11 18h2" />
+          </svg>
+          <input
+            type="tel"
+            formControlName="celular"
+            class="register-field-input"
+            placeholder="9XXXXXXXX"
+            maxlength="9"
+            [class.register-field-input--invalid]="form.get('celular')?.invalid && form.get('celular')?.touched"
+          />
+        </span>
         <span class="register-field-error" *ngIf="form.get('celular')?.invalid && form.get('celular')?.touched">
           Ingresa un celular válido (9 dígitos, empieza con 9).
         </span>
@@ -56,7 +129,10 @@
 
       <button type="submit" class="register-submit-btn" [disabled]="submitting()">
         <span class="register-spinner" *ngIf="submitting()"></span>
-        {{ submitting() ? 'Creando cuenta...' : 'Continuar al pago' }}
+        <span>{{ submitting() ? 'Creando cuenta...' : 'Continuar al pago' }}</span>
+        <svg *ngIf="!submitting()" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
       </button>
     </form>
 

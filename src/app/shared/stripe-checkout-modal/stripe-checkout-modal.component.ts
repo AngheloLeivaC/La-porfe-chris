@@ -29,6 +29,7 @@ export class StripeCheckoutModalComponent implements OnInit {
   @Input({ required: true }) userId!: number;
   @Input({ required: true }) items: StripeCartItem[] = [];
   @Input() totalLabel = '';
+  @Input() itemLabel = '';
 
   @Output() closed = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
@@ -57,7 +58,12 @@ export class StripeCheckoutModalComponent implements OnInit {
         }
 
         this.elements = this.stripe.elements({ clientSecret });
-        this.paymentElement = this.elements.create('payment');
+        this.paymentElement = this.elements.create('payment', {
+          // "Link" agrega su propia sección de correo/celular/nombre para
+          // guardar la tarjeta — duplica lo que ya pedimos en el registro
+          // y es lo que más alarga el formulario. La desactivamos.
+          wallets: { link: 'never' },
+        });
         this.paymentElement.mount(this.paymentElementRef.nativeElement);
         this.loadingForm.set(false);
       },
