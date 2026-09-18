@@ -120,13 +120,33 @@ export class CrmApiService {
     );
   }
 
-  createStripePaymentIntent(
-    userId: number,
-    items: { product_id: number; product_type: number }[]
-  ): Observable<{ clientSecret: string }> {
+  /**
+   * Crea el PaymentIntent embebido. Enviar SOLO uno de los dos:
+   * - userId: alumno que ya tiene cuenta.
+   * - registration: datos del paso 1 para un usuario nuevo, todavía sin
+   *   guardar — el backend lo crea recién cuando el pago se confirma.
+   */
+  createStripePaymentIntent(params: {
+    userId?: number;
+    registration?: {
+      name: string;
+      email: string;
+      phone: string;
+      password: string;
+      doc_type_id: number | null;
+      number_doc: string;
+      country: string;
+      birthday: string;
+    };
+    items: { product_id: number; product_type: number }[];
+  }): Observable<{ clientSecret: string }> {
     return this.http.post<{ clientSecret: string }>(
       `${this.baseUrl}/payments/stripe/create-payment-intent`,
-      { user_id: userId, items }
+      {
+        user_id: params.userId,
+        registration: params.registration,
+        items: params.items,
+      }
     );
   }
 

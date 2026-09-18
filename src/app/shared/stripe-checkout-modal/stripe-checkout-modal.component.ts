@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { loadStripe, Stripe, StripeElements, StripePaymentElement } from '@stripe/stripe-js';
 import { CrmApiService } from '../../core/crm-api.service';
 import { environment } from '../../../environments/environment';
+import { PendingRegistration } from '../register-modal/register-modal.component';
 
 export interface StripeCartItem {
   product_id: number;
@@ -26,7 +27,14 @@ export interface StripeCartItem {
   styleUrl: './stripe-checkout-modal.component.css',
 })
 export class StripeCheckoutModalComponent implements OnInit {
-  @Input({ required: true }) userId!: number;
+  // Uno de los dos, según de dónde venga la compra:
+  // - userId: alumno que ya tiene cuenta (ej. comprando otro curso desde
+  //   el aula virtual).
+  // - pendingRegistration: usuario nuevo desde la landing, que llenó el
+  //   paso 1 pero AÚN NO tiene cuenta creada. La cuenta recién se crea
+  //   en el backend cuando el pago se confirma (ver webhook de Stripe).
+  @Input() userId: number | null = null;
+  @Input() pendingRegistration: PendingRegistration | null = null;
   @Input({ required: true }) items: StripeCartItem[] = [];
   @Input() totalLabel = '';
   @Input() itemLabel = '';
@@ -48,30 +56,41 @@ export class StripeCheckoutModalComponent implements OnInit {
   constructor(private crmApi: CrmApiService) {}
 
   ngOnInit(): void {
-    this.crmApi.createStripePaymentIntent(this.userId, this.items).subscribe({
-      next: async ({ clientSecret }) => {
-        this.stripe = await loadStripe(environment.stripePublishableKey);
-        if (!this.stripe) {
-          this.errorMessage.set('No se pudo cargar el formulario de pago.');
-          this.loadingForm.set(false);
-          return;
-        }
+    this.crmApi
+      .createStripePaymentIntent({
+        userId: this.userId ?? undefined,
+        registration: this.pendingRegistration ?? undefined,
+        items: this.items,
+      })
+      .subscribe({
+        next: async ({ clientSecret }) => {
+          this.stripe = await loadStripe(environment.stripePublishableKey);
+          if (!this.stripe) {
+            this.errorMessage.set('No se pudo cargar el formulario de pago.');
+            this.loadingForm.set(false);
+            return;
+          }
 
-        this.elements = this.stripe.elements({ clientSecret });
-        this.paymentElement = this.elements.create('payment', {
-          // "Link" agrega su propia sección de correo/celular/nombre para
-          // guardar la tarjeta — duplica lo que ya pedimos en el registro
-          // y es lo que más alarga el formulario. La desactivamos.
-          wallets: { link: 'never' },
-        });
-        this.paymentElement.mount(this.paymentElementRef.nativeElement);
-        this.loadingForm.set(false);
-      },
-      error: () => {
-        this.errorMessage.set('No se pudo iniciar el pago. Intenta nuevamente.');
-        this.loadingForm.set(false);
-      },
-    });
+          this.elements = this.stripe.elements({ clientSecret });
+          this.paymentElement = this.elements.create('payment', {
+            // "Link" agrega su propia sección de correo/celular/nombre para
+            // guardar la tarjeta — duplica lo que ya pedimos en el registro
+            // y es lo que más alarga el formulario. La desactivamos.
+            wallets: { link: 'never' },
+          });
+          this.paymentElement.mount(this.paymentElementRef.nativeElement);
+          this.loadingForm.set(false);
+        },
+        error: (err) => {
+          // El backend puede rechazar aquí un email/DNI duplicado (cuando
+          // viene de pendingRegistration) — mostramos ese mensaje real en
+          // vez de uno genérico.
+          this.errorMessage.set(
+            err?.error?.message || 'No se pudo iniciar el pago. Intenta nuevamente.'
+          );
+          this.loadingForm.set(false);
+        },
+      });
   }
 
   async pagar(): Promise<void> {

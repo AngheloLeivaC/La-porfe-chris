@@ -12,7 +12,7 @@ import { ContentService } from '../../core/content.service';
 import { Course, CourseLanguage } from '../../core/models';
 import {
   RegisterModalComponent,
-  RegisteredUser,
+  PendingRegistration,
 } from '../../shared/register-modal/register-modal.component';
 import {
   StripeCheckoutModalComponent,
@@ -37,7 +37,9 @@ export class CoursesComponent implements AfterViewChecked, OnDestroy {
 
   // ---- Flujo de compra: registro -> pago ----
   readonly buyingCourse = signal<Course | null>(null);
-  readonly registeredUser = signal<RegisteredUser | null>(null);
+  // Datos del paso 1, SOLO en memoria: el backend no crea al usuario hasta
+  // que el pago del paso 2 se confirme (evita guardar gente que nunca paga).
+  readonly pendingRegistration = signal<PendingRegistration | null>(null);
   readonly purchaseDone = signal(false);
 
   constructor(public content: ContentService) {}
@@ -133,9 +135,9 @@ export class CoursesComponent implements AfterViewChecked, OnDestroy {
     this.buyingCourse.set(course);
   }
 
-  // Paso 2: cuando el registro termina bien, pasa al pago
-  onRegistered(user: RegisteredUser): void {
-    this.registeredUser.set(user);
+  // Paso 2: guarda los datos del paso 1 (aún sin persistir) y pasa al pago
+  onRegistered(data: PendingRegistration): void {
+    this.pendingRegistration.set(data);
   }
 
   // Items para el modal de Stripe, a partir del curso que se está comprando
@@ -152,11 +154,11 @@ export class CoursesComponent implements AfterViewChecked, OnDestroy {
   onPaymentSuccess(): void {
     this.purchaseDone.set(true);
     this.buyingCourse.set(null);
-    this.registeredUser.set(null);
+    this.pendingRegistration.set(null);
   }
 
   closeBuyFlow(): void {
     this.buyingCourse.set(null);
-    this.registeredUser.set(null);
+    this.pendingRegistration.set(null);
   }
 }

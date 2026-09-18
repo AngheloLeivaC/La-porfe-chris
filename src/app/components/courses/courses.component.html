@@ -95,18 +95,18 @@
   <button class="purchase-success-close" (click)="purchaseDone.set(false)" aria-label="Cerrar">✕</button>
 </div>
 
-<!-- Paso 1: registro -->
+<!-- Paso 1: registro (datos en memoria, todavía no se guardan en el backend) -->
 <app-register-modal
-  *ngIf="buyingCourse() && !registeredUser()"
+  *ngIf="buyingCourse() && !pendingRegistration()"
   [course]="buyingCourse()"
   (closed)="closeBuyFlow()"
   (registered)="onRegistered($event)"
 ></app-register-modal>
 
-<!-- Paso 2: pago -->
+<!-- Paso 2: pago. La cuenta recién se crea en el backend cuando el pago se confirma -->
 <app-stripe-checkout-modal
-  *ngIf="registeredUser() as user"
-  [userId]="user.id"
+  *ngIf="pendingRegistration() as registration"
+  [pendingRegistration]="registration"
   [items]="paymentItems"
   [totalLabel]="paymentTotalLabel"
   [itemLabel]="buyingCourse()?.title ?? ''"
