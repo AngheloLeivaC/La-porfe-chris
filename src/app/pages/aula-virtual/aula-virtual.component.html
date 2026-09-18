@@ -97,13 +97,6 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="activeSection() === 'inicio'">
-        <h1 class="aula-title">
-          Bienvenido{{ auth.currentUser()?.name ? ', ' + auth.currentUser()!.name : '' }}
-        </h1>
-        <div class="aula-state">Próximamente: un resumen general aquí.</div>
-      </ng-container>
-
       <ng-container *ngIf="activeSection() === 'marketplace'">
         <app-marketplace-section></app-marketplace-section>
       </ng-container>
@@ -114,13 +107,7 @@
       </ng-container>
 
       <ng-container *ngIf="activeSection() === 'calendario'">
-        <h1 class="aula-title">Calendario</h1>
-        <div class="aula-state">Esta sección está en construcción. ¡Vuelve pronto!</div>
-      </ng-container>
-
-      <ng-container *ngIf="activeSection() === 'configuracion'">
-        <h1 class="aula-title">Configuración</h1>
-        <div class="aula-state">Esta sección está en construcción. ¡Vuelve pronto!</div>
+        <app-calendar-panel></app-calendar-panel>
       </ng-container>
 
     </main>

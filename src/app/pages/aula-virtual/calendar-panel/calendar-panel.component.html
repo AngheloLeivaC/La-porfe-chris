@@ -1,0 +1,114 @@
+<div class="calendar-layout">
+
+  <section class="calendar-card">
+    <header class="calendar-header">
+      <h1 class="aula-title calendar-month-title">{{ monthLabel() }}</h1>
+      <div class="calendar-nav">
+        <button type="button" class="calendar-nav-btn" (click)="prevMonth()" aria-label="Mes anterior">‹</button>
+        <button type="button" class="calendar-today-btn" (click)="goToday()">Hoy</button>
+        <button type="button" class="calendar-nav-btn" (click)="nextMonth()" aria-label="Mes siguiente">›</button>
+      </div>
+    </header>
+
+    <div class="calendar-state" *ngIf="loadError()">
+      No pudimos cargar tu calendario. Intenta recargar la página.
+    </div>
+
+    <div class="calendar-grid calendar-weekdays">
+      <span *ngFor="let w of weekdayLabels">{{ w }}</span>
+    </div>
+
+    <div class="calendar-grid" *ngFor="let week of weeks()">
+      <button
+        type="button"
+        class="calendar-day"
+        *ngFor="let cell of week"
+        [class.calendar-day--out]="!cell.inCurrentMonth"
+        [class.calendar-day--today]="cell.isToday"
+        [class.calendar-day--selected]="cell.iso === selectedDate()"
+        (click)="selectDay(cell)"
+      >
+        <span class="calendar-day-number">{{ cell.date.getDate() }}</span>
+        <span class="calendar-day-dots" *ngIf="eventsForDay(cell.iso).length as count">
+          <span
+            class="calendar-dot"
+            *ngFor="let ev of eventsForDay(cell.iso).slice(0, 3)"
+            [class.calendar-dot--actividad]="ev.type === 'actividad'"
+          ></span>
+          <span class="calendar-day-more" *ngIf="count > 3">+{{ count - 3 }}</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <aside class="calendar-side">
+    <h2 class="calendar-side-title">{{ selectedDateLabel() }}</h2>
+
+    <ul class="calendar-event-list" *ngIf="eventsBySelectedDay().length > 0; else noEvents">
+      <li class="calendar-event" *ngFor="let ev of eventsBySelectedDay()">
+        <span class="calendar-event-badge" [class.calendar-event-badge--actividad]="ev.type === 'actividad'">
+          {{ ev.type === 'actividad' ? 'Actividad' : 'Recordatorio' }}
+        </span>
+        <div class="calendar-event-body">
+          <p class="calendar-event-title">
+            {{ ev.title }}
+            <span class="calendar-event-time" *ngIf="ev.time">· {{ ev.time }}</span>
+          </p>
+          <p class="calendar-event-note" *ngIf="ev.note">{{ ev.note }}</p>
+        </div>
+        <div class="calendar-event-actions">
+          <button type="button" class="calendar-icon-btn" (click)="editEvent(ev)" aria-label="Editar">✎</button>
+          <button type="button" class="calendar-icon-btn calendar-icon-btn--danger" (click)="deleteEvent(ev)" aria-label="Eliminar">✕</button>
+        </div>
+      </li>
+    </ul>
+    <ng-template #noEvents>
+      <p class="calendar-empty">No hay nada apuntado este día todavía.</p>
+    </ng-template>
+
+    <form class="calendar-form" (ngSubmit)="saveEvent()">
+      <h3 class="calendar-form-title">{{ editingId() ? 'Editar' : 'Añadir a este día' }}</h3>
+
+      <div class="calendar-form-row calendar-form-row--type">
+        <label class="calendar-type-option">
+          <input type="radio" name="formType" value="recordatorio" [(ngModel)]="formType" />
+          Recordatorio
+        </label>
+        <label class="calendar-type-option">
+          <input type="radio" name="formType" value="actividad" [(ngModel)]="formType" />
+          Actividad
+        </label>
+      </div>
+
+      <div class="calendar-form-row">
+        <input
+          type="text"
+          class="calendar-input"
+          placeholder="Título"
+          name="formTitle"
+          [(ngModel)]="formTitle"
+          required
+        />
+      </div>
+
+      <div class="calendar-form-row calendar-form-row--split">
+        <input type="time" class="calendar-input" name="formTime" [(ngModel)]="formTime" />
+        <input
+          type="text"
+          class="calendar-input"
+          placeholder="Nota (opcional)"
+          name="formNote"
+          [(ngModel)]="formNote"
+        />
+      </div>
+
+      <div class="calendar-form-actions">
+        <button type="button" class="calendar-cancel-btn" *ngIf="editingId()" (click)="cancelEdit()">Cancelar</button>
+        <button type="submit" class="calendar-save-btn" [disabled]="!formTitle.trim() || saving()">
+          {{ saving() ? 'Guardando...' : (editingId() ? 'Guardar cambios' : 'Añadir') }}
+        </button>
+      </div>
+    </form>
+  </aside>
+
+</div>

@@ -9,11 +9,12 @@ import { environment } from '../../../environments/environment';
 import { AulaSidebarComponent, AulaSection } from './aula-sidebar/aula-sidebar.component';
 import { MarketplaceSectionComponent } from './marketplace-section/marketplace-section.component';
 import { ActivitiesPanelComponent } from './activities-panel/activities-panel.component';
+import { CalendarPanelComponent } from './calendar-panel/calendar-panel.component';
 
 @Component({
   selector: 'app-aula-virtual',
   standalone: true,
-  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent, ActivitiesPanelComponent],
+  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent, ActivitiesPanelComponent, CalendarPanelComponent],
   templateUrl: './aula-virtual.component.html',
   styleUrl: './aula-virtual.component.css',
 })

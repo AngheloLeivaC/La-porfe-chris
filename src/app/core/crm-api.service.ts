@@ -10,6 +10,7 @@ import {
   LoginEnvelope,
   PurchasedCourse,
   ActivityItem,
+  CalendarEventApi,
    DocumentTypeItem,
     RegisterAcademyUserResponse,
 
@@ -105,6 +106,50 @@ export class CrmApiService {
 
   markTaskIncomplete(tareaId: number, userId: number): Observable<unknown> {
     return this.http.delete(`${this.baseUrl}/tareas/${tareaId}/complete`, {
+      body: { user_id: userId },
+    });
+  }
+
+  /** Trae los eventos del calendario personal del alumno. from/to son opcionales, en formato YYYY-MM-DD. */
+  getCalendarEvents(userId: number, from?: string, to?: string): Observable<CalendarEventApi[]> {
+    let url = `${this.baseUrl}/user/${userId}/calendar`;
+    const params: string[] = [];
+    if (from) params.push(`from=${from}`);
+    if (to) params.push(`to=${to}`);
+    if (params.length) url += `?${params.join('&')}`;
+    return this.http.get<CalendarEventApi[]>(url);
+  }
+
+  createCalendarEvent(payload: {
+    user_id: number;
+    date: string;
+    type: 'recordatorio' | 'actividad';
+    title: string;
+    time?: string;
+    note?: string;
+  }): Observable<CalendarEventApi> {
+    return this.http.post<CalendarEventApi>(`${this.baseUrl}/calendar`, payload);
+  }
+
+  updateCalendarEvent(
+    id: number,
+    userId: number,
+    payload: Partial<{
+      date: string;
+      type: 'recordatorio' | 'actividad';
+      title: string;
+      time: string | null;
+      note: string | null;
+    }>
+  ): Observable<CalendarEventApi> {
+    return this.http.put<CalendarEventApi>(`${this.baseUrl}/calendar/${id}`, {
+      user_id: userId,
+      ...payload,
+    });
+  }
+
+  deleteCalendarEvent(id: number, userId: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/calendar/${id}`, {
       body: { user_id: userId },
     });
   }

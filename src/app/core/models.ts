@@ -153,6 +153,16 @@ export interface ActivityItem {
   course_name: string | null;
   completed: boolean;
 }
+export interface CalendarEventApi {
+  id: number;
+  user_id: number;
+  date: string; // YYYY-MM-DD
+  type: 'recordatorio' | 'actividad';
+  title: string;
+  time: string | null; // HH:mm
+  note: string | null;
+}
+
 export interface DocumentTypeItem {
   id: number;
   name: string;

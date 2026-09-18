@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type AulaSection = 'mis-cursos' | 'certificaciones' | 'marketplace' | 'inicio' | 'calendario' | 'configuracion';
+export type AulaSection = 'mis-cursos' | 'certificaciones' | 'marketplace' | 'calendario';
 
 interface SidebarItem {
   id: AulaSection;
@@ -37,9 +37,7 @@ export class AulaSidebarComponent {
     { id: 'mis-cursos', label: 'Mis Cursos' },
     { id: 'certificaciones', label: 'Certificaciones' },
     { id: 'marketplace', label: 'Marketplace' },
-    { id: 'inicio', label: 'Inicio' },
     { id: 'calendario', label: 'Calendario' },
-    { id: 'configuracion', label: 'Configuración' },
   ];
 
   select(id: AulaSection): void {
