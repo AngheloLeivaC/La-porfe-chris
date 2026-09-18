@@ -1,14 +1,28 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ContentService } from '../../core/content.service';
 import { Course } from '../../core/models';
 import { EnrollmentModalComponent } from '../../shared/enrollment-modal/enrollment-modal.component';
+import {
+  RegisterModalComponent,
+  PendingRegistration,
+} from '../../shared/register-modal/register-modal.component';
+import {
+  StripeCheckoutModalComponent,
+  StripeCartItem,
+} from '../../shared/stripe-checkout-modal/stripe-checkout-modal.component';
 
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, EnrollmentModalComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    EnrollmentModalComponent,
+    RegisterModalComponent,
+    StripeCheckoutModalComponent,
+  ],
   templateUrl: './course-detail.component.html',
   styleUrl: './course-detail.component.css',
 })
@@ -21,6 +35,12 @@ export class CourseDetailComponent implements OnInit {
   videoPlaying = false;
   openModuleIndex: number | null = 0;
   showEnrollmentModal = false;
+
+  // ---- Flujo de compra: registro -> pago (mismo que en la landing) ----
+  readonly buyingCourse = signal<Course | null>(null);
+  readonly pendingRegistration = signal<PendingRegistration | null>(null);
+  readonly purchaseDone = signal(false);
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -54,6 +74,8 @@ export class CourseDetailComponent implements OnInit {
 
       this.videoPlaying = false;
       this.openModuleIndex = 0;
+      this.buyingCourse.set(null);
+      this.pendingRegistration.set(null);
       window.scrollTo({ top: 0 });
     });
   }
@@ -96,5 +118,39 @@ export class CourseDetailComponent implements OnInit {
 
   closeEnrollmentModal(): void {
     this.showEnrollmentModal = false;
+  }
+
+  // Paso 1: abre el modal de registro para el curso de esta página
+  comprar(): void {
+    if (!this.course) return;
+    this.purchaseDone.set(false);
+    this.buyingCourse.set(this.course);
+  }
+
+  // Paso 2: guarda los datos del paso 1 (aún sin persistir) y pasa al pago
+  onRegistered(data: PendingRegistration): void {
+    this.pendingRegistration.set(data);
+  }
+
+  // Items para el modal de Stripe, a partir del curso que se está comprando
+  get paymentItems(): StripeCartItem[] {
+    const course = this.buyingCourse();
+    if (!course?.id || !course?.tipoProductoId) return [];
+    return [{ product_id: course.id, product_type: course.tipoProductoId }];
+  }
+
+  get paymentTotalLabel(): string {
+    return this.buyingCourse()?.price ?? '';
+  }
+
+  onPaymentSuccess(): void {
+    this.purchaseDone.set(true);
+    this.buyingCourse.set(null);
+    this.pendingRegistration.set(null);
+  }
+
+  closeBuyFlow(): void {
+    this.buyingCourse.set(null);
+    this.pendingRegistration.set(null);
   }
 }

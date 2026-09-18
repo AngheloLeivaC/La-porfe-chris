@@ -376,3 +376,40 @@
 .course-detail-not-found .btn {
   margin-top: 12px;
 }
+.purchase-success-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid rgba(25, 135, 84, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 150;
+  max-width: 92vw;
+}
+
+.purchase-success-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-on-surface);
+}
+
+.purchase-success-link {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.purchase-success-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  font-size: 0.9rem;
+}

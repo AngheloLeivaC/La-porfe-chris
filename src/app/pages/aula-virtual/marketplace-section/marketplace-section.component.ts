@@ -121,7 +121,7 @@ export class MarketplaceSectionComponent implements OnInit {
     if (!user) return;
 
     this.errorMessage.set(null);
-    this.payingTotalLabel.set(`S/ ${this.priceLabel(course)}`);
+    this.payingTotalLabel.set(`$ ${this.priceLabel(course)}`);
     this.payingItems.set([
       { product_id: course.id, product_type: course.tipo_producto_id },
     ]);
@@ -159,7 +159,7 @@ export class MarketplaceSectionComponent implements OnInit {
     if (!user || this.cart.count === 0) return;
 
     this.errorMessage.set(null);
-    this.payingTotalLabel.set(`S/ ${this.cart.total.toFixed(2)}`);
+    this.payingTotalLabel.set(`$ ${this.cart.total.toFixed(2)}`);
     this.payingItems.set(
       this.cart.items().map((c) => ({
         product_id: c.id,

@@ -188,7 +188,7 @@ export class ContentService {
     level: item.nivel ?? '',
     badgeColor: LANGUAGE_BADGE_COLOR[language],
     title: item.nombre,
-    price: `S/. ${Number(item.precio).toFixed(2)}`,
+    price: `$ ${Number(item.precio).toFixed(2)}`,
     text: item.resumen_corto ?? '',
     weeks: item.duracion_semanas ? `${item.duracion_semanas} Semanas` : '',
     img: this.resolveImageUrl(item.portada_url),
@@ -258,7 +258,7 @@ export class ContentService {
     },
     precios: {
       id: 'precios',
-      bot: 'Los cursos van desde €149 (A1) hasta €199 (B1), con clases en vivo + material grabado. ¿Quieres que te pasemos el detalle completo por WhatsApp?',
+      bot: 'Los cursos van desde $149 (A1) hasta $199 (B1), con clases en vivo + material grabado. ¿Quieres que te pasemos el detalle completo por WhatsApp?',
       options: [
         { label: '✅ Sí, por WhatsApp', action: 'whatsapp' },
         { label: '👀 Ver cursos en la página', action: 'scroll-cursos' },
@@ -323,7 +323,7 @@ export class ContentService {
           level: details.tipo ?? '',
           badgeColor: LANGUAGE_BADGE_COLOR[language],
           title: details.nombre,
-          price: `S/. ${Number(details.precio).toFixed(2)}`,
+          price: `$ ${Number(details.precio).toFixed(2)}`,
           text: details.descripcion || '',
           weeks: '',
           img: this.resolveImageUrl(details.portada_url),

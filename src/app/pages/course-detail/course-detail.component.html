@@ -72,7 +72,7 @@
                 <span class="course-buy-price-note">Pago único</span>
               </div>
 
-              <button type="button" class="course-buy-btn" (click)="openEnrollmentModal()">
+              <button type="button" class="course-buy-btn" (click)="comprar()">
                 Inscribirme ahora
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -170,4 +170,30 @@
   </div>
   <app-enrollment-modal *ngIf="showEnrollmentModal && course" [courseTitle]="course.title"
     (closed)="closeEnrollmentModal()"></app-enrollment-modal>
+
+  <!-- Aviso de compra exitosa -->
+  <div class="purchase-success-banner" *ngIf="purchaseDone()">
+    <p>¡Listo! Revisa tu correo — te enviamos tu usuario y contraseña para entrar al Aula Virtual.</p>
+    <a routerLink="/login" class="purchase-success-link">Ir a iniciar sesión →</a>
+    <button class="purchase-success-close" (click)="purchaseDone.set(false)" aria-label="Cerrar">✕</button>
+  </div>
+
+  <!-- Paso 1: registro (datos en memoria, todavía no se guardan en el backend) -->
+  <app-register-modal
+    *ngIf="buyingCourse() && !pendingRegistration()"
+    [course]="buyingCourse()"
+    (closed)="closeBuyFlow()"
+    (registered)="onRegistered($event)"
+  ></app-register-modal>
+
+  <!-- Paso 2: pago. La cuenta recién se crea en el backend cuando el pago se confirma -->
+  <app-stripe-checkout-modal
+    *ngIf="pendingRegistration() as registration"
+    [pendingRegistration]="registration"
+    [items]="paymentItems"
+    [totalLabel]="paymentTotalLabel"
+    [itemLabel]="buyingCourse()?.title ?? ''"
+    (closed)="closeBuyFlow()"
+    (success)="onPaymentSuccess()"
+  ></app-stripe-checkout-modal>
 </section>

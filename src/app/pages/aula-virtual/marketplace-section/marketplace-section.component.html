@@ -95,7 +95,7 @@
       <p class="marketplace-name">{{ course.nombre }}</p>
 
       <div class="marketplace-price-row">
-        <span class="marketplace-currency">S/</span>
+        <span class="marketplace-currency">$</span>
         <span class="marketplace-price">{{ priceLabel(course) }}</span>
       </div>
 
@@ -146,7 +146,7 @@
         <p class="quickview-title">{{ course.nombre }}</p>
 
         <div class="marketplace-price-row">
-          <span class="marketplace-currency">S/</span>
+          <span class="marketplace-currency">$</span>
           <span class="marketplace-price">{{ priceLabel(course) }}</span>
         </div>
 
@@ -209,7 +209,7 @@
         <img class="cart-item-thumb" [src]="courseImage(item)" [alt]="item.nombre" />
         <div class="cart-item-info">
           <p class="cart-item-name">{{ item.nombre }}</p>
-          <span class="cart-item-price">S/ {{ priceLabel(item) }}</span>
+          <span class="cart-item-price">$ {{ priceLabel(item) }}</span>
         </div>
         <button class="cart-item-remove" (click)="removeFromCart(item.id)" aria-label="Quitar">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,7 +222,7 @@
     <div class="cart-panel-footer" *ngIf="cart.count > 0">
       <div class="cart-total-row">
         <span>Total</span>
-        <span class="cart-total-amount">S/ {{ cart.total.toFixed(2) }}</span>
+        <span class="cart-total-amount">$ {{ cart.total.toFixed(2) }}</span>
       </div>
 
       <button class="marketplace-btn cart-checkout-btn" [disabled]="cartCheckingOut()" (click)="checkoutCart()">
