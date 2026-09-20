@@ -1,0 +1,144 @@
+<div class="exam-page">
+
+  <!-- Barra superior mínima -->
+  <header class="exam-topbar">
+    <a [routerLink]="['/aula-virtual']" class="exam-back-link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+      Volver
+    </a>
+    <img [src]="content.images.logo" alt="La Profe Chris" class="exam-logo" />
+    <div class="aula-stripe" aria-hidden="true">
+      <span class="stripe-bleu"></span>
+      <span class="stripe-blanc"></span>
+      <span class="stripe-rouge"></span>
+    </div>
+  </header>
+
+  <main class="exam-main">
+
+    <div *ngIf="loading()" class="aula-state">Cargando examen...</div>
+
+    <div *ngIf="!loading() && loadError()" class="aula-state aula-state--error">
+      No pudimos cargar este examen. Vuelve a la lista de exámenes e inténtalo de nuevo.
+    </div>
+
+    <ng-container *ngIf="!loading() && !loadError() && examData() as data">
+
+      <!-- Resultado final -->
+      <div class="exam-result-card" *ngIf="result() as res">
+        <ng-container *ngIf="res.kind === 'waiting'">
+          <div class="exam-result-icon exam-result-icon--waiting">⏳</div>
+          <h2 class="exam-result-title">Tu examen se revisará pronto</h2>
+          <p class="exam-result-text">Tiene preguntas de respuesta abierta, así que un profesor debe calificarlas manualmente.</p>
+        </ng-container>
+
+        <ng-container *ngIf="res.kind === 'graded'">
+          <div class="exam-result-icon" [class.exam-result-icon--ok]="res.approved" [class.exam-result-icon--fail]="!res.approved">
+            {{ res.approved ? '✓' : '✕' }}
+          </div>
+          <h2 class="exam-result-title">Has {{ res.approved ? 'aprobado' : 'desaprobado' }} el examen</h2>
+          <p class="exam-result-text">
+            Puntaje obtenido: <strong>{{ res.rate }}</strong> (mínimo para aprobar: {{ res.minPassingScore }})
+          </p>
+          <p class="exam-result-text" *ngIf="res.correctCount + res.incorrectCount > 0">
+            {{ res.correctCount }} correctas · {{ res.incorrectCount }} incorrectas
+          </p>
+        </ng-container>
+
+        <button type="button" class="exam-primary-btn" (click)="backToExams()">Volver a Exámenes</button>
+      </div>
+
+      <!-- Pantalla de inicio -->
+      <div class="exam-start-card" *ngIf="!started() && !result()">
+        <h1 class="exam-title">{{ data.exam.title }}</h1>
+        <span class="exam-time-chip">
+          {{ hasTimeLimit() ? 'Tiempo límite: ' + timeLabel() : 'Examen sin tiempo' }}
+        </span>
+        <p class="exam-meta">{{ totalQuestions() }} pregunta{{ totalQuestions() === 1 ? '' : 's' }}</p>
+        <button type="button" class="exam-primary-btn exam-start-btn" (click)="startExam()">Empezar</button>
+      </div>
+
+      <!-- Examen en curso -->
+      <div class="exam-runner" *ngIf="started() && !result()">
+
+        <div class="exam-progress-bar">
+          <button
+            type="button"
+            class="exam-step-dot"
+            *ngFor="let q of data.questions; let i = index"
+            [class.exam-step-dot--current]="i === currentIndex()"
+            [class.exam-step-dot--correct]="stepStatus()[i] === 'correct'"
+            [class.exam-step-dot--incorrect]="stepStatus()[i] === 'incorrect'"
+            (click)="goToStep(i)"
+          >
+            {{ i + 1 }}
+          </button>
+
+          <span class="exam-timer-chip" *ngIf="hasTimeLimit()">⏱ {{ timeLabel() }}</span>
+        </div>
+
+        <div class="exam-question-card" *ngIf="currentQuestion() as q">
+          <div class="exam-question-head">
+            <p class="exam-question-count">Pregunta {{ currentIndex() + 1 }} de {{ totalQuestions() }}</p>
+            <p class="exam-question-points">{{ q.points }} pts</p>
+          </div>
+
+          <h2 class="exam-question-title">{{ q.title }}</h2>
+
+          <!-- Selección simple o binaria -->
+          <div class="exam-options" *ngIf="q.question_type_id === 1 || q.question_type_id === 3">
+            <button
+              type="button"
+              class="exam-option"
+              *ngFor="let opt of q.options; let i = index"
+              [class.exam-option--selected]="isSelected(i)"
+              (click)="selectSingle(i)"
+            >
+              <span class="exam-option-marker"></span>
+              {{ opt }}
+            </button>
+          </div>
+
+          <!-- Selección múltiple -->
+          <div class="exam-options" *ngIf="q.question_type_id === 2">
+            <button
+              type="button"
+              class="exam-option exam-option--checkbox"
+              *ngFor="let opt of q.options; let i = index"
+              [class.exam-option--selected]="isSelected(i)"
+              (click)="toggleMultiple(i)"
+            >
+              <span class="exam-option-marker exam-option-marker--square"></span>
+              {{ opt }}
+            </button>
+          </div>
+
+          <!-- Pregunta abierta -->
+          <div class="exam-open-answer" *ngIf="q.question_type_id === 4">
+            <textarea
+              class="exam-textarea"
+              placeholder="Responde aquí..."
+              maxlength="500"
+              rows="4"
+              [ngModel]="currentAnswer()"
+              (ngModelChange)="setOpenAnswer($event)"
+            ></textarea>
+          </div>
+
+          <div class="exam-controls">
+            <button type="button" class="exam-secondary-btn" (click)="goPrev()" [disabled]="currentIndex() === 0">
+              Anterior
+            </button>
+            <button type="button" class="exam-primary-btn" (click)="goNext()" [disabled]="!canAdvance() || submitting()">
+              {{ submitting() ? 'Enviando...' : (isLastQuestion() ? 'Enviar' : 'Siguiente') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </main>
+</div>

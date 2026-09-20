@@ -106,6 +106,10 @@
         <div class="aula-state">Esta sección está en construcción. ¡Vuelve pronto!</div>
       </ng-container>
 
+      <ng-container *ngIf="activeSection() === 'examenes'">
+        <app-exams-panel></app-exams-panel>
+      </ng-container>
+
       <ng-container *ngIf="activeSection() === 'calendario'">
         <app-calendar-panel></app-calendar-panel>
       </ng-container>

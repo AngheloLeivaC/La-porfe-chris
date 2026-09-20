@@ -18,7 +18,7 @@ export class AppComponent {
 
   // Rutas que son "aplicaciones aparte", sin el header/footer/chatbot
   // del landing (el login y el aula virtual tienen su propio diseño).
-  private readonly standaloneRoutes = ['/login', '/aula-virtual'];
+  private readonly standaloneRoutes = ['/login', '/aula-virtual', '/examen'];
 
   readonly showMarketingShell = signal(true);
 

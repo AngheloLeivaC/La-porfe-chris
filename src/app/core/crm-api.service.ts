@@ -11,6 +11,9 @@ import {
   PurchasedCourse,
   ActivityItem,
   CalendarEventApi,
+  ExamListResponse,
+  ExamDataResponse,
+  ExamAnswerResult,
    DocumentTypeItem,
     RegisterAcademyUserResponse,
 
@@ -152,6 +155,37 @@ export class CrmApiService {
     return this.http.delete(`${this.baseUrl}/calendar/${id}`, {
       body: { user_id: userId },
     });
+  }
+
+  /** Lista de exámenes (curso, módulos y clases) de un curso comprado, con estado de avance del alumno. */
+  getExamList(courseSlug: string): Observable<ExamListResponse> {
+    return this.http.get<ExamListResponse>(`${this.baseUrl}/course/exam/list`, {
+      params: { slug: courseSlug },
+    });
+  }
+
+  /** Trae el examen y sus preguntas para poder rendirlo. */
+  getExam(examId: number): Observable<{ status: number; data: ExamDataResponse }> {
+    return this.http.post<{ status: number; data: ExamDataResponse }>(`${this.baseUrl}/course/exam`, {
+      exam_id: examId,
+    });
+  }
+
+  /** El curso al que pertenece un examen (lo necesita el envío de respuestas). */
+  getCourseIdForExam(examId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/course/exam/course-id`, {
+      params: { exam_id: examId },
+    });
+  }
+
+  /** Envía las respuestas del alumno para que el backend las califique. */
+  submitExamAnswers(payload: {
+    id_exam: number;
+    answers: { option: unknown }[];
+    course_id: number;
+    seconds_used: number;
+  }): Observable<ExamAnswerResult | 'Waiting'> {
+    return this.http.post<ExamAnswerResult | 'Waiting'>(`${this.baseUrl}/course/exam/answers`, payload);
   }
 
   /** Crea una sesión de pago de Stripe y devuelve la URL a la que redirigir. */

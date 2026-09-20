@@ -1,0 +1,88 @@
+<div class="exams-panel">
+  <h1 class="aula-title">Exámenes</h1>
+  <p class="aula-subtitle">Revisa tu avance y rinde los exámenes pendientes de cada curso.</p>
+
+  <div *ngIf="coursesLoading()" class="aula-state">Cargando tus cursos...</div>
+  <div *ngIf="!coursesLoading() && coursesError()" class="aula-state aula-state--error">
+    No pudimos cargar tus cursos en este momento. Intenta recargar la página.
+  </div>
+  <div *ngIf="!coursesLoading() && !coursesError() && courses().length === 0" class="aula-state">
+    Todavía no tienes cursos activos. Explora nuestro Marketplace para empezar.
+  </div>
+
+  <ng-container *ngIf="!coursesLoading() && !coursesError() && courses().length > 0">
+
+    <!-- Selector de curso -->
+    <div class="exam-course-selector">
+      <button
+        type="button"
+        class="exam-course-chip"
+        *ngFor="let course of courses()"
+        [class.exam-course-chip--active]="selectedCourse()?.id === course.id"
+        (click)="selectCourse(course)"
+      >
+        <img [src]="courseImage(course)" [alt]="course.nombre" class="exam-course-chip-img" />
+        <span class="exam-course-chip-name">{{ course.nombre }}</span>
+      </button>
+    </div>
+
+    <div *ngIf="examLoading()" class="aula-state">Cargando exámenes...</div>
+    <div *ngIf="!examLoading() && examError()" class="aula-state aula-state--error">
+      No pudimos cargar los exámenes de este curso.
+    </div>
+
+    <ng-container *ngIf="!examLoading() && !examError() && examData() as data">
+
+      <!-- Resumen de avance -->
+      <div class="exam-summary-card">
+        <div class="exam-summary-text">
+          <p class="exam-summary-course">{{ selectedCourse()?.nombre }}</p>
+          <p class="exam-summary-caption" *ngIf="progressLabel() !== null; else noExams">
+            Has aprobado el {{ progressLabel() }}% de los exámenes de este curso.
+          </p>
+          <ng-template #noExams>
+            <p class="exam-summary-caption">Este curso todavía no tiene exámenes configurados.</p>
+          </ng-template>
+        </div>
+        <div class="exam-progress-ring" *ngIf="progressLabel() !== null" [style.--pct]="progressLabel()">
+          <span class="exam-progress-value">{{ progressLabel() }}%</span>
+        </div>
+      </div>
+
+      <!-- Lista de exámenes -->
+      <div class="exam-list" *ngIf="rows().length > 0">
+        <div class="exam-row" *ngFor="let row of rows()">
+          <span class="exam-level-tag" [ngClass]="'exam-level-tag--' + row.level">{{ row.level }}</span>
+
+          <span class="exam-row-name">{{ row.name }}</span>
+
+          <span class="exam-status" [class.exam-status--approved]="row.approved">
+            {{ row.approved ? 'Aprobado' : 'Pendiente' }}
+          </span>
+
+          <button
+            type="button"
+            class="exam-action-btn"
+            [class.exam-action-btn--done]="row.approved"
+            *ngIf="!row.approved && row.examId as examId; else doneOrLocked"
+            [routerLink]="['/examen', examId]"
+            [queryParams]="{ courseId: selectedCourse()?.id }"
+          >
+            Realizar examen
+          </button>
+          <ng-template #doneOrLocked>
+            <button type="button" class="exam-action-btn exam-action-btn--done" disabled>
+              {{ row.approved ? '✓ Aprobado' : 'Realizar examen' }}
+            </button>
+          </ng-template>
+        </div>
+      </div>
+
+      <div *ngIf="rows().length === 0" class="aula-state">
+        Este curso no tiene exámenes disponibles todavía.
+      </div>
+
+    </ng-container>
+
+  </ng-container>
+</div>

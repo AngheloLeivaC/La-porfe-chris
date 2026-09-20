@@ -163,6 +163,69 @@ export interface CalendarEventApi {
   note: string | null;
 }
 
+/** Fila de examen a nivel de clase o de módulo, tal como la devuelve /course/exam/list. */
+export interface ExamListEntry {
+  name: string;
+  slug: string;
+  exist: boolean;
+  approved: boolean;
+  exam_id?: number;
+  class_id?: number;
+  module_id?: number;
+}
+
+/** El examen general del curso (mismo shape, pero con nombre de campos del producto). */
+export interface ExamListCourse {
+  product_id: number;
+  nombre: string;
+  slug: string;
+  exist: boolean;
+  approved: boolean;
+  exam_id?: number;
+}
+
+export interface ExamListResponse {
+  exams_class: ExamListEntry[];
+  exams_module: ExamListEntry[];
+  exam_course: ExamListCourse;
+  counter_class: number;
+  counter_module: number;
+  counter_course: number;
+  exam_progress: number | 'empty';
+}
+
+/** El examen tal como lo entrega POST /course/exam { exam_id }. */
+export interface ExamDetails {
+  id: number;
+  title: string;
+  time: number | null; // segundos. null o 59999940 = "sin tiempo".
+  min_passing_score: number;
+  max_score: number;
+}
+
+export interface ExamQuestionApi {
+  id: number;
+  title: string;
+  points: number;
+  options: string[];
+  correct: string; // índice (o índices separados por coma) de la(s) opción(es) correcta(s)
+  question_type_id: 1 | 2 | 3 | 4; // 1 simple, 2 múltiple, 3 binaria, 4 abierta
+}
+
+export interface ExamDataResponse {
+  exam: ExamDetails;
+  questions: ExamQuestionApi[];
+}
+
+/** Lo que responde POST /course/exam/answers al calificar. */
+export interface ExamAnswerResult {
+  rate?: number;
+  message?: 'Aprobado' | 'Desaprobado' | string;
+  points?: number;
+  points_gained?: number;
+  rank?: number;
+}
+
 export interface DocumentTypeItem {
   id: number;
   name: string;

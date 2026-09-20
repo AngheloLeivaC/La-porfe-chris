@@ -1,0 +1,350 @@
+.exam-page {
+  min-height: 100vh;
+  background: var(--color-surface-container-low, #f6f3f2);
+  font-family: var(--font-body);
+}
+
+/* ---- Barra superior (misma línea visual que el aula virtual) ---- */
+
+.exam-topbar {
+  background: #0b1f3a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+}
+
+.exam-back-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.exam-back-link:hover {
+  opacity: 1;
+}
+
+.exam-logo {
+  height: 26px;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+  margin-left: 4px;
+}
+
+.aula-stripe {
+  display: flex;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stripe-bleu { flex: 1; background: #0055a4; }
+.stripe-blanc { flex: 1; background: #ffffff; }
+.stripe-rouge { flex: 1; background: #ef4135; }
+
+/* ---- Contenedor principal ---- */
+
+.exam-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.aula-state {
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  padding: 60px 0;
+  font-size: 0.9rem;
+}
+
+.aula-state--error {
+  color: #a02f2f;
+}
+
+/* ---- Tarjeta de inicio ---- */
+
+.exam-start-card,
+.exam-result-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 40px 28px;
+  text-align: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+}
+
+.exam-title {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--color-on-surface);
+  text-transform: capitalize;
+}
+
+.exam-time-chip {
+  display: inline-block;
+  background: #0b1f3a;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+}
+
+.exam-meta {
+  margin: 14px 0 24px;
+  font-size: 0.85rem;
+  color: var(--color-on-surface-variant);
+}
+
+.exam-primary-btn {
+  border: none;
+  border-radius: 12px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+  cursor: pointer;
+}
+
+.exam-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.exam-start-btn {
+  padding: 12px 40px;
+}
+
+.exam-secondary-btn {
+  border: 1.5px solid var(--color-outline-variant, #c0c6d6);
+  background: #ffffff;
+  color: var(--color-on-surface);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 11px 22px;
+  cursor: pointer;
+}
+
+.exam-secondary-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Barra de progreso de preguntas ---- */
+
+.exam-progress-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.exam-step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #dfe2ea;
+  color: #555b6e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exam-step-dot--current {
+  background: #0b1f3a;
+  color: #ffffff;
+}
+
+.exam-step-dot--correct {
+  background: #2f7d4f;
+  color: #ffffff;
+}
+
+.exam-step-dot--incorrect {
+  background: #a02f2f;
+  color: #ffffff;
+}
+
+.exam-timer-chip {
+  margin-left: auto;
+  background: #0b1f3a;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* ---- Tarjeta de pregunta ---- */
+
+.exam-question-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+}
+
+.exam-question-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.exam-question-count,
+.exam-question-points {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.exam-question-title {
+  margin: 4px 0 22px;
+  font-size: 1.05rem;
+  color: var(--color-on-surface);
+  line-height: 1.4;
+}
+
+.exam-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.exam-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  border: 1.5px solid var(--color-outline-variant, #c0c6d6);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.exam-option:hover {
+  border-color: var(--color-primary);
+}
+
+.exam-option--selected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, #ffffff);
+}
+
+.exam-option-marker {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-outline-variant, #c0c6d6);
+}
+
+.exam-option-marker--square {
+  border-radius: 5px;
+}
+
+.exam-option--selected .exam-option-marker {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.exam-open-answer {
+  margin-bottom: 26px;
+}
+
+.exam-textarea {
+  width: 100%;
+  border: 1.5px solid var(--color-outline-variant, #c0c6d6);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+  resize: vertical;
+}
+
+.exam-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.exam-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ---- Resultado ---- */
+
+.exam-result-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  background: var(--color-surface-container-low, #f6f3f2);
+  color: var(--color-on-surface-variant);
+}
+
+.exam-result-icon--ok {
+  background: #e3f4e8;
+  color: #2f7d4f;
+}
+
+.exam-result-icon--fail {
+  background: #fbe6e6;
+  color: #a02f2f;
+}
+
+.exam-result-icon--waiting {
+  background: #fff4e0;
+}
+
+.exam-result-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--color-on-surface);
+}
+
+.exam-result-text {
+  margin: 0 0 6px;
+  font-size: 0.88rem;
+  color: var(--color-on-surface-variant);
+}
+
+.exam-result-card .exam-primary-btn {
+  margin-top: 18px;
+}
+
+@media (max-width: 560px) {
+  .exam-main {
+    padding: 20px 14px 40px;
+  }
+
+  .exam-start-card,
+  .exam-question-card,
+  .exam-result-card {
+    padding: 22px 18px;
+  }
+}
