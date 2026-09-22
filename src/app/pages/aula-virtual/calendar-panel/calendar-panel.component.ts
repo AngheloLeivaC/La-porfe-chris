@@ -3,9 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth.service';
 import { CrmApiService } from '../../../core/crm-api.service';
-import { CalendarEventApi } from '../../../core/models';
+import { CalendarEventApi, PurchasedCourse } from '../../../core/models';
 
 export type CalendarEventType = 'recordatorio' | 'actividad';
+
+type ValidityUrgency = 'ok' | 'warning' | 'danger' | 'expired';
+
+interface CourseValidityRow {
+  nombre: string;
+  fechaInicio: string;
+  fechaFin: string;
+  diasRestantes: number;
+  progressPct: number;
+  urgency: ValidityUrgency;
+}
 
 interface DayCell {
   date: Date;
@@ -37,6 +48,9 @@ export class CalendarPanelComponent implements OnInit {
   readonly loadError = signal(false);
   readonly saving = signal(false);
 
+  readonly purchasedCourses = signal<PurchasedCourse[]>([]);
+  readonly coursesLoading = signal(false);
+
   // Formulario para crear/editar un evento del día seleccionado.
   readonly editingId = signal<number | null>(null);
   formTitle = '';
@@ -51,6 +65,7 @@ export class CalendarPanelComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.auth.currentUser()?.id ?? null;
     this.fetchEvents();
+    this.fetchCourseValidity();
   }
 
   readonly monthLabel = computed(() => {
@@ -232,6 +247,54 @@ export class CalendarPanelComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  private fetchCourseValidity(): void {
+    if (!this.userId) return;
+    this.coursesLoading.set(true);
+    this.crmApi.getPurchasedProducts(this.userId).subscribe({
+      next: (courses) => {
+        this.purchasedCourses.set(courses.filter((c) => c.fecha_inicio && c.fecha_fin));
+        this.coursesLoading.set(false);
+      },
+      error: () => this.coursesLoading.set(false),
+    });
+  }
+
+  readonly courseValidityRows = computed<CourseValidityRow[]>(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.purchasedCourses().map((c) => {
+      const inicio = new Date(c.fecha_inicio + 'T00:00:00');
+      const fin = new Date(c.fecha_fin + 'T00:00:00');
+
+      const totalDays = Math.max(1, Math.round((fin.getTime() - inicio.getTime()) / 86400000));
+      const elapsedDays = Math.round((today.getTime() - inicio.getTime()) / 86400000);
+      const diasRestantes = Math.round((fin.getTime() - today.getTime()) / 86400000);
+
+      const progressPct = Math.min(100, Math.max(0, (elapsedDays / totalDays) * 100));
+
+      let urgency: ValidityUrgency;
+      if (diasRestantes < 0) urgency = 'expired';
+      else if (diasRestantes <= 7) urgency = 'danger';
+      else if (diasRestantes <= 30) urgency = 'warning';
+      else urgency = 'ok';
+
+      return {
+        nombre: c.nombre,
+        fechaInicio: c.fecha_inicio!,
+        fechaFin: c.fecha_fin!,
+        diasRestantes,
+        progressPct,
+        urgency,
+      };
+    });
+  });
+
+  formatShortDate(iso: string): string {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   private startOfMonth(d: Date): Date {

@@ -141,6 +141,8 @@ export interface PurchasedCourse {
   fechaVencimiento?: string;
   slug_product?: string;
   tipo_producto_id?: number;
+  fecha_inicio?: string; // YYYY-MM-DD
+  fecha_fin?: string; // YYYY-MM-DD
 }
 
 /** Una fila del panel "Actividades" (tarea o examen con fecha). */

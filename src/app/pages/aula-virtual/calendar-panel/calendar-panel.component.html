@@ -1,3 +1,22 @@
+<div class="course-validity-strip" *ngIf="!coursesLoading() && courseValidityRows().length > 0">
+  <div class="validity-card" *ngFor="let row of courseValidityRows()" [ngClass]="'validity-card--' + row.urgency">
+    <p class="validity-name">{{ row.nombre }}</p>
+
+    <div class="validity-progress-track">
+      <div class="validity-progress-fill" [style.width.%]="row.progressPct"></div>
+    </div>
+
+    <div class="validity-dates">
+      <span>{{ formatShortDate(row.fechaInicio) }}</span>
+      <span>{{ formatShortDate(row.fechaFin) }}</span>
+    </div>
+
+    <span class="validity-badge">
+      {{ row.diasRestantes < 0 ? 'Vencido' : row.diasRestantes + ' días restantes' }}
+    </span>
+  </div>
+</div>
+
 <div class="calendar-layout">
 
   <section class="calendar-card">

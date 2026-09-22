@@ -1,3 +1,99 @@
+/* ---- Franja de vigencia de cursos ---- */
+
+.course-validity-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 2px 16px;
+}
+
+.validity-card {
+  flex: 0 0 auto;
+  width: 220px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--color-outline-variant, #c0c6d6);
+}
+
+.validity-card--ok {
+  border-left-color: #2f7d4f;
+}
+
+.validity-card--warning {
+  border-left-color: #b8860b;
+}
+
+.validity-card--danger,
+.validity-card--expired {
+  border-left-color: #a02f2f;
+}
+
+.validity-name {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.validity-progress-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-surface-container-low, #f6f3f2);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.validity-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+.validity-card--warning .validity-progress-fill {
+  background: #b8860b;
+}
+
+.validity-card--danger .validity-progress-fill,
+.validity-card--expired .validity-progress-fill {
+  background: #a02f2f;
+}
+
+.validity-dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.validity-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--color-surface-container-low, #f6f3f2);
+  color: var(--color-on-surface-variant);
+}
+
+.validity-card--ok .validity-badge {
+  color: #2f7d4f;
+}
+
+.validity-card--warning .validity-badge {
+  color: #b8860b;
+}
+
+.validity-card--danger .validity-badge,
+.validity-card--expired .validity-badge {
+  color: #a02f2f;
+}
+
 .calendar-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
