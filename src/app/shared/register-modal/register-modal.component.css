@@ -234,7 +234,7 @@
 }
 
 .register-phone-code {
-  flex: 0 0 108px;
+  flex: 0 0 112px;
   border: 1.5px solid var(--color-outline-variant, #d0d5dd);
   border-radius: 10px;
   padding: 11px 6px;
@@ -242,6 +242,8 @@
   font-family: var(--font-body);
   color: var(--color-on-surface);
   background: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .register-phone-code:focus {
