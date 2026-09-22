@@ -327,7 +327,7 @@ export class RegisterModalComponent implements OnInit {
       // entre 5 y 20 caracteres. Ya no se limita al DNI peruano de 8 dígitos.
       dni: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9](?:[A-Za-z0-9 .-]{3,18})[A-Za-z0-9]$/)]],
       email: ['', [Validators.required, Validators.email]],
-      countryIso: ['PE', [Validators.required]],
+      countryIso: ['FR', [Validators.required]],
       // Solo el número local (sin código de país); el '+código' se arma
       // con lo elegido en 'countryIso' al momento de enviar. El rango
       // 4-15 dígitos cubre los números de celular de cualquier país
