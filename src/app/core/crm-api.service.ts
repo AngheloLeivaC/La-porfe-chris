@@ -86,6 +86,50 @@ export class CrmApiService {
     );
   }
 
+  /**
+   * Cambio de contraseña del alumno logueado (POST /user/change-pass).
+   * El backend responde con TEXTO PLANO (no JSON) y siempre con HTTP 200:
+   * "Cambio de contraseña exitoso" si todo salió bien, o
+   * "Ingrese su contraseña actual correctamente" si la actual no coincide.
+   * Por eso se pide responseType 'text'.
+   */
+  changePassword(payload: {
+    actual_pass: string;
+    new_pass: string;
+    repeat_pass: string;
+  }): Observable<string> {
+    return this.http.post(`${this.baseUrl}/user/change-pass`, payload, {
+      responseType: 'text',
+    });
+  }
+
+  /**
+   * Paso 1 de "olvidé mi contraseña": el backend genera un código de 5 dígitos
+   * y lo envía por correo. Responde texto plano (HTTP 200):
+   * "!Se ha enviado el correo de recuperación!" o "!Correo no registrado!".
+   */
+  sendRecoveryEmail(email: string): Observable<string> {
+    return this.http.post(`${this.baseUrl}/public/sendRecoveryEmail`, { email }, {
+      responseType: 'text',
+    });
+  }
+
+  /**
+   * Paso 2: valida el código y guarda la nueva contraseña. Responde texto plano:
+   * "Contraseña reestablecida", "Código de recuperación incorrecto, intentos
+   * restantes: N", "Ha alcanzado el máximo de intentos..." o "El correo no está
+   * registrado".
+   */
+  recoverPassword(payload: {
+    email: string;
+    code: string;
+    password: string;
+  }): Observable<string> {
+    return this.http.post(`${this.baseUrl}/public/recoveryPassword`, payload, {
+      responseType: 'text',
+    });
+  }
+
   savePayment(payload: {
     user_id: number;
     product_id: number;

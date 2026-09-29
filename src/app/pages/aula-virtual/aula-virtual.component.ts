@@ -11,11 +11,12 @@ import { MarketplaceSectionComponent } from './marketplace-section/marketplace-s
 import { ActivitiesPanelComponent } from './activities-panel/activities-panel.component';
 import { CalendarPanelComponent } from './calendar-panel/calendar-panel.component';
 import { ExamsPanelComponent } from './exams-panel/exams-panel.component';
+import { PasswordPanelComponent } from './password-panel/password-panel.component';
 
 @Component({
   selector: 'app-aula-virtual',
   standalone: true,
-  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent, ActivitiesPanelComponent, CalendarPanelComponent, ExamsPanelComponent],
+  imports: [CommonModule, RouterLink, AulaSidebarComponent, MarketplaceSectionComponent, ActivitiesPanelComponent, CalendarPanelComponent, ExamsPanelComponent, PasswordPanelComponent],
   templateUrl: './aula-virtual.component.html',
   styleUrl: './aula-virtual.component.css',
 })

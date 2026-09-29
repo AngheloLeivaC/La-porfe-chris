@@ -31,7 +31,13 @@ export class LoginComponent {
     private auth: AuthService,
     private router: Router,
     public content: ContentService
-  ) {}
+  ) {
+    // Si vienes de "recuperar contraseña", el correo ya queda escrito.
+    const email = typeof history !== 'undefined' ? history.state?.email : null;
+    if (typeof email === 'string' && email) {
+      this.form.patchValue({ email });
+    }
+  }
 
   setMode(mode: 'estudiante' | 'administrador'): void {
     this.mode.set(mode);

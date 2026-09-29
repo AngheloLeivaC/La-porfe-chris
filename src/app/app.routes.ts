@@ -4,6 +4,7 @@ import { CourseDetailComponent } from './pages/course-detail/course-detail.compo
 import { LoginComponent } from './pages/login/login.component';
 import { AulaVirtualComponent } from './pages/aula-virtual/aula-virtual.component';
 import { ExamRunnerComponent } from './pages/exam-runner/exam-runner.component';
+   import { RecoverPasswordComponent } from './pages/recover-password/recover-password.component';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'aula-virtual', component: AulaVirtualComponent, canActivate: [authGuard] },
   { path: 'examen/:examId', component: ExamRunnerComponent, canActivate: [authGuard] },
+     { path: 'recuperar-contrasena', component: RecoverPasswordComponent },
   { path: '**', redirectTo: '' },
 ];

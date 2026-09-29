@@ -104,6 +104,16 @@
             </span>
           </label>
 
+          <div class="forgot-row">
+            <a
+              [routerLink]="['/recuperar-contrasena']"
+              [state]="{ email: form.controls.email.value ?? '' }"
+              class="forgot-link"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
           <div class="form-alert" *ngIf="errorMessage()">
             {{ errorMessage() }}
           </div>

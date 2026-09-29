@@ -114,6 +114,10 @@
         <app-calendar-panel></app-calendar-panel>
       </ng-container>
 
+      <ng-container *ngIf="activeSection() === 'contrasena'">
+        <app-password-panel></app-password-panel>
+      </ng-container>
+
     </main>
   </div>
 
