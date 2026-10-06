@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { CrmApiService } from '../../core/crm-api.service';
 import { ContentService } from '../../core/content.service';
@@ -33,7 +33,8 @@ export class AulaVirtualComponent implements OnInit {
     public auth: AuthService,
     private crmApi: CrmApiService,
     public content: ContentService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +69,12 @@ export class AulaVirtualComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  /** "Continuar": abre el curso y retoma la última clase que el alumno empezó. */
+  openCourse(course: PurchasedCourse): void {
+    if (course.is_blocked === 1 || !course.slug_product) return;
+    this.router.navigate(['/aula-virtual/curso', course.slug_product]);
   }
 
   courseImage(course: PurchasedCourse): string {

@@ -238,3 +238,64 @@ export interface RegisterAcademyUserResponse {
   message: string;
   data: { id: number; name: string; email: string } | null;
 }
+
+// ---------------------------------------------------------------------------
+// Pantalla de clase (reproductor del aula virtual)
+// ---------------------------------------------------------------------------
+
+/** Una lección del temario, tal como la devuelve GET /course/temary/get-all-class/{slug} (autenticado). */
+export interface CourseLesson {
+  id: number;
+  id_modules?: number;
+  name: string;
+  slug: string;
+  /** Duración "HH:MM:SS" (columna TIME, puede venir vacía). */
+  time?: string | null;
+  /** HTML de la descripción de la clase. */
+  description?: string | null;
+  order?: number | null;
+  is_preview?: number;
+  /** true si el alumno ya empezó esta clase (tiene tiempo guardado). */
+  checkpoint: boolean;
+}
+
+export interface CourseModuleContent {
+  name: string;
+  lessons: CourseLesson[];
+}
+
+/** Temario del curso comprado + fechas de acceso del alumno. */
+export interface CourseContent {
+  title: string;
+  daysUntil: number;
+  /** YYYY-MM-DD */
+  fechaInicio: string;
+  /** YYYY-MM-DD */
+  fechaVencimiento: string;
+  modules: CourseModuleContent[];
+}
+
+/** Producto tal como lo devuelve GET /public/course/info/{productSlug}/empty slug. */
+export interface CourseProductInfo {
+  id: number;
+  slug: string;
+  nombre: string;
+  tipo_producto_id?: number;
+}
+
+/** Un recurso descargable de una clase. */
+export interface ClassResource {
+  id: number;
+  filename: string;
+  resource_file?: string;
+}
+
+/** GET /course/class/get-links/{producto}/{clase}. `external_links` es HTML. */
+export interface ClassLinksResponse {
+  external_links: string | null;
+}
+
+/** GET /purchased/get-time: segundos guardados (a veces llegan como texto). */
+export interface ClassTimeResponse {
+  time: number | string;
+}

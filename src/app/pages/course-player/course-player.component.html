@@ -1,0 +1,269 @@
+<div class="cp">
+
+  <!-- ===== Barra superior ===== -->
+  <header class="cp-header">
+    <a class="cp-back" [routerLink]="['/aula-virtual']" aria-label="Volver a Mis cursos">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+      <span>Mis cursos</span>
+    </a>
+    <h1 class="cp-course">{{ content()?.title }}</h1>
+    <div class="cp-pill" *ngIf="status() === 'ready' && total() > 0">{{ percent() }}% visto</div>
+  </header>
+
+  <!-- ===== Cargando ===== -->
+  <div class="cp-layout" *ngIf="status() === 'loading'" aria-busy="true" aria-label="Cargando el curso">
+    <section class="cp-main">
+      <div class="cp-stage cp-skeleton"></div>
+      <div class="cp-skel-line cp-skel-line--lg"></div>
+      <div class="cp-skel-line"></div>
+    </section>
+    <aside class="cp-side">
+      <div class="cp-side-card">
+        <div class="cp-skel-line cp-skel-line--lg"></div>
+        <div class="cp-skel-line"></div><div class="cp-skel-line"></div><div class="cp-skel-line"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===== Error / vencido / vacío ===== -->
+  <div class="cp-state" *ngIf="status() === 'error'" role="alert">
+    <h2>No pudimos abrir el curso</h2>
+    <p>{{ errorText() }}</p>
+    <a class="cp-btn" [routerLink]="['/aula-virtual']">Volver a mis cursos</a>
+  </div>
+
+  <div class="cp-state" *ngIf="status() === 'expired'">
+    <h2>El tiempo de este curso terminó</h2>
+    <p>Tu acceso venció el {{ content()?.fechaVencimiento }}. Solicita tiempo extra al administrador si lo necesitas.</p>
+    <a class="cp-btn" [routerLink]="['/aula-virtual']">Volver a mis cursos</a>
+  </div>
+
+  <div class="cp-state" *ngIf="status() === 'ready' && total() === 0">
+    <h2>Este curso aún no tiene clases</h2>
+    <p>Cuando se publiquen las clases las verás aquí.</p>
+    <a class="cp-btn" [routerLink]="['/aula-virtual']">Volver a mis cursos</a>
+  </div>
+
+  <!-- ===== Clase ===== -->
+  <div class="cp-layout" *ngIf="status() === 'ready' && current() as lesson">
+
+    <section class="cp-main">
+
+      <!-- Video -->
+      <div class="cp-stage">
+        <ng-container *ngIf="videoState() === 'ready' && videoUrl() as url">
+          <video
+            #video
+            class="cp-video"
+            [src]="url"
+            controls
+            playsinline
+            preload="metadata"
+            controlsList="nodownload"
+            (loadedmetadata)="onLoadedMetadata()"
+            (play)="onPlay()"
+            (pause)="onPause()"
+            (ended)="onEnded()"
+            (timeupdate)="onTimeUpdate()"
+            (error)="onVideoError()"
+          ></video>
+        </ng-container>
+
+        <div class="cp-stage-msg" *ngIf="videoState() === 'loading'" role="status">
+          <span class="cp-spinner" aria-hidden="true"></span> Cargando video…
+        </div>
+        <div class="cp-stage-msg" *ngIf="videoState() === 'none'" role="status">
+          Esta clase todavía no tiene video.
+        </div>
+
+        <div class="cp-toast" *ngIf="resumeNotice() as notice" role="status">{{ notice }}</div>
+
+        <div class="cp-stage-msg cp-stage-msg--error" *ngIf="videoError() as err" role="alert">
+          <p class="cp-err-title">No se pudo reproducir el video</p>
+          <p class="cp-err-text">{{ err }}</p>
+          <div class="cp-err-actions">
+            <button type="button" class="cp-btn cp-btn--sm" (click)="retryVideo()">Reintentar</button>
+            <a class="cp-btn cp-btn--sm cp-btn--ghost" *ngIf="videoUrl() as u" [href]="u" target="_blank" rel="noopener noreferrer">Abrir video en otra pestaña</a>
+          </div>
+        </div>
+
+        <div class="cp-ended" *ngIf="ended()">
+          <p class="cp-ended-title">¡Clase terminada!</p>
+          <ng-container *ngIf="nextLesson() as next; else lastLesson">
+            <p class="cp-ended-next">Sigue con: <strong>{{ next.name }}</strong></p>
+            <button type="button" class="cp-btn" (click)="goTo(next)">Siguiente clase →</button>
+          </ng-container>
+          <ng-template #lastLesson>
+            <p class="cp-ended-next">Llegaste a la última clase del curso.</p>
+            <a class="cp-btn" [routerLink]="['/aula-virtual']">Volver a mis cursos</a>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Título y controles -->
+      <div class="cp-head">
+        <div class="cp-head-text">
+          <p class="cp-eyebrow">
+            Clase {{ currentIndex() + 1 }} de {{ total() }}<span *ngIf="currentModuleName()"> · {{ currentModuleName() }}</span>
+          </p>
+          <h2 class="cp-lesson-title">{{ lesson.name }}</h2>
+        </div>
+
+        <div class="cp-controls">
+          <div class="cp-rates" role="group" aria-label="Velocidad de reproducción">
+            <button
+              type="button"
+              *ngFor="let r of rates"
+              class="cp-rate"
+              [class.cp-rate--on]="rate() === r"
+              [attr.aria-pressed]="rate() === r"
+              (click)="setRate(r)"
+            >{{ r }}x</button>
+          </div>
+          <div class="cp-nav">
+            <button type="button" class="cp-btn cp-btn--ghost" [disabled]="!prevLesson()" (click)="goTo(prevLesson()!)">← Anterior</button>
+            <button type="button" class="cp-btn" [disabled]="!nextLesson()" (click)="goTo(nextLesson()!)">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestañas -->
+      <div class="cp-tabs" role="tablist" aria-label="Información de la clase">
+        <button
+          type="button"
+          *ngFor="let t of tabs"
+          role="tab"
+          class="cp-tab"
+          [class.cp-tab--on]="tab() === t.id"
+          [attr.aria-selected]="tab() === t.id"
+          (click)="setTab(t.id)"
+        >{{ t.label }}</button>
+      </div>
+
+      <div class="cp-panel" role="tabpanel">
+
+        <!-- Descripción -->
+        <ng-container *ngIf="tab() === 'descripcion'">
+          <div class="cp-rich" *ngIf="hasDescription(lesson); else noDescription" [innerHTML]="lesson.description"></div>
+          <ng-template #noDescription><p class="cp-empty">Esta clase no tiene descripción.</p></ng-template>
+        </ng-container>
+
+        <!-- Recursos -->
+        <ng-container *ngIf="tab() === 'recursos'">
+          <p class="cp-empty" *ngIf="resources().status === 'loading'">Cargando recursos…</p>
+          <p class="cp-empty cp-empty--error" *ngIf="resources().status === 'error'">
+            No pudimos cargar los recursos. <button type="button" class="cp-link" (click)="retry('recursos')">Reintentar</button>
+          </p>
+          <ng-container *ngIf="resources().status === 'ready'">
+            <p class="cp-empty" *ngIf="!resources().data?.length">Esta clase no tiene recursos.</p>
+            <ul class="cp-list" *ngIf="resources().data?.length">
+              <li class="cp-item" *ngFor="let r of resources().data">
+                <svg class="cp-item-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /></svg>
+                <span class="cp-item-name">{{ r.filename }}</span>
+                <button type="button" class="cp-btn cp-btn--sm" [disabled]="downloading().has(r.id)" (click)="download(r)">
+                  {{ downloading().has(r.id) ? 'Descargando…' : 'Descargar' }}
+                </button>
+              </li>
+            </ul>
+          </ng-container>
+          <p class="cp-empty cp-empty--error" *ngIf="downloadError() as err" role="alert">{{ err }}</p>
+        </ng-container>
+
+        <!-- Enlaces -->
+        <ng-container *ngIf="tab() === 'enlaces'">
+          <p class="cp-empty" *ngIf="links().status === 'loading'">Cargando enlaces…</p>
+          <p class="cp-empty cp-empty--error" *ngIf="links().status === 'error'">
+            No pudimos cargar los enlaces. <button type="button" class="cp-link" (click)="retry('enlaces')">Reintentar</button>
+          </p>
+          <ng-container *ngIf="links().status === 'ready'">
+            <div class="cp-rich" *ngIf="links().data; else noLinks" [innerHTML]="links().data" (click)="onLinksClick($event)"></div>
+            <ng-template #noLinks><p class="cp-empty">Esta clase no tiene enlaces externos.</p></ng-template>
+          </ng-container>
+        </ng-container>
+
+        <!-- Exámenes -->
+        <ng-container *ngIf="tab() === 'examenes'">
+          <p class="cp-empty" *ngIf="examData().status === 'loading'">Cargando exámenes…</p>
+          <p class="cp-empty cp-empty--error" *ngIf="examData().status === 'error'">
+            No pudimos cargar los exámenes. <button type="button" class="cp-link" (click)="retry('examenes')">Reintentar</button>
+          </p>
+          <ng-container *ngIf="examData().status === 'ready'">
+
+            <div class="cp-exam-hero" *ngIf="currentExam() as ex" [class.cp-exam-hero--ok]="ex.approved">
+              <div>
+                <p class="cp-exam-hero-title">Examen de esta clase</p>
+                <p class="cp-exam-hero-sub">{{ ex.approved ? 'Ya aprobaste este examen. ¡Bien hecho!' : 'Pon a prueba lo que aprendiste.' }}</p>
+              </div>
+              <span class="cp-badge" *ngIf="ex.approved">Aprobado</span>
+              <a class="cp-btn" *ngIf="!ex.approved" [routerLink]="['/examen', ex.examId]">Rendir examen</a>
+            </div>
+            <p class="cp-empty" *ngIf="!currentExam()">Esta clase no tiene examen propio.</p>
+
+            <ng-container *ngIf="examRows().length > (currentExam() ? 1 : 0)">
+              <h3 class="cp-sub">Otros exámenes del curso</h3>
+              <ul class="cp-list">
+                <ng-container *ngFor="let r of examRows()">
+                  <li class="cp-item" *ngIf="!r.isCurrent">
+                    <span class="cp-level">{{ r.level }}</span>
+                    <span class="cp-item-name">{{ r.name }}</span>
+                    <span class="cp-badge" *ngIf="r.approved">Aprobado</span>
+                    <a class="cp-btn cp-btn--sm" *ngIf="!r.approved" [routerLink]="['/examen', r.examId]">Rendir</a>
+                  </li>
+                </ng-container>
+              </ul>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+      </div>
+    </section>
+
+    <!-- ===== Temario ===== -->
+    <aside class="cp-side" aria-label="Contenido del curso">
+      <div class="cp-side-card">
+        <div class="cp-side-head">
+          <h2 class="cp-side-title">Contenido del curso</h2>
+          <p class="cp-side-sub">{{ completed() }} de {{ total() }} clases vistas</p>
+          <div class="cp-bar" role="progressbar" [attr.aria-valuenow]="percent()" aria-valuemin="0" aria-valuemax="100" aria-label="Avance del curso">
+            <span [style.width.%]="percent()"></span>
+          </div>
+          <p class="cp-days" *ngIf="daysLeft() !== null && daysLeft()! >= 0">
+            Acceso: {{ daysLeft() === 0 ? 'vence hoy' : daysLeft() === 1 ? 'te queda 1 día' : 'te quedan ' + daysLeft() + ' días' }}
+          </p>
+        </div>
+
+        <div class="cp-modules">
+          <div class="cp-module" *ngFor="let m of content()?.modules; let i = index">
+            <button type="button" class="cp-module-btn" (click)="toggleModule(i)" [attr.aria-expanded]="isOpen(i)">
+              <span class="cp-module-name">{{ i + 1 }}. {{ m.name }}</span>
+              <span class="cp-module-count">{{ moduleDone(m) }}/{{ m.lessons.length }}</span>
+              <svg class="cp-chevron" [class.cp-chevron--open]="isOpen(i)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </button>
+
+            <ul class="cp-lessons" *ngIf="isOpen(i)">
+              <li *ngFor="let l of m.lessons">
+                <button
+                  type="button"
+                  class="cp-lesson"
+                  [class.cp-lesson--active]="l.id === lesson.id"
+                  [class.cp-lesson--done]="l.checkpoint"
+                  [attr.aria-current]="l.id === lesson.id ? 'true' : null"
+                  (click)="goTo(l)"
+                >
+                  <span class="cp-lesson-icon" aria-hidden="true">
+                    <svg *ngIf="l.checkpoint && l.id !== lesson.id" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                    <svg *ngIf="l.id === lesson.id" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  </span>
+                  <span class="cp-lesson-name">{{ l.name }}</span>
+                  <span class="cp-lesson-time">{{ lessonDuration(l.time) }}</span>
+                  <span class="sr-only">{{ l.checkpoint ? '(vista)' : '' }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>

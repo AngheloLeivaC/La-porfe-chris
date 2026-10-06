@@ -71,7 +71,11 @@
 
             <div *ngIf="!loading() && !loadError() && courses().length > 0" class="courses-grid">
               <div class="course-card" *ngFor="let course of courses()">
-                <div class="course-thumb">
+                <div
+                  class="course-thumb"
+                  [style.cursor]="course.is_blocked === 1 ? 'default' : 'pointer'"
+                  (click)="openCourse(course)"
+                >
                   <img [src]="courseImage(course)" [alt]="course.nombre" />
                   <span class="course-badge" [ngClass]="courseStatus(course).className">
                     {{ courseStatus(course).label }}
@@ -83,6 +87,7 @@
                     class="course-btn"
                     [ngClass]="courseStatus(course).className + '-btn'"
                     [disabled]="course.is_blocked === 1"
+                    (click)="openCourse(course)"
                   >
                     {{ course.is_blocked === 1 ? 'Bloqueado' : 'Continuar' }}
                   </button>

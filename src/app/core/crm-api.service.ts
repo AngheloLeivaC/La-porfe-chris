@@ -14,6 +14,11 @@ import {
   ExamListResponse,
   ExamDataResponse,
   ExamAnswerResult,
+  CourseContent,
+  CourseProductInfo,
+  ClassResource,
+  ClassLinksResponse,
+  ClassTimeResponse,
    DocumentTypeItem,
     RegisterAcademyUserResponse,
 
@@ -199,6 +204,82 @@ export class CrmApiService {
     return this.http.delete(`${this.baseUrl}/calendar/${id}`, {
       body: { user_id: userId },
     });
+  }
+
+  // ---------- Pantalla de clase (reproductor) ----------
+
+  /** Temario del curso comprado, con las clases que el alumno ya empezó (`checkpoint`) y sus fechas de acceso. */
+  getCourseContent(slug: string): Observable<CourseContent> {
+    return this.http.get<CourseContent>(`${this.baseUrl}/course/temary/get-all-class/${encodeURIComponent(slug)}`);
+  }
+
+  /** Datos del producto (id, nombre) a partir de su slug; el backend lo resuelve con el literal "empty slug". */
+  getCourseProduct(slug: string): Observable<CourseProductInfo | null> {
+    return this.http.get<CourseProductInfo | null>(
+      `${this.baseUrl}/public/course/info/${encodeURIComponent(slug)}/empty%20slug`
+    );
+  }
+
+  /** URL (S3) del video de una clase. El backend responde texto plano. */
+  getClassVideoUrl(classSlug: string, productId: number): Observable<string> {
+    return this.http.get(`${this.baseUrl}/video/stream-video`, {
+      params: { slug: classSlug, product_id: productId },
+      responseType: 'text',
+    });
+  }
+
+  /** Segundo donde el alumno dejó la clase. Da error si nunca la vio (el backend no lo controla). */
+  getClassTime(productId: number, classId: number): Observable<ClassTimeResponse | null> {
+    return this.http.get<ClassTimeResponse | null>(`${this.baseUrl}/purchased/get-time`, {
+      params: { courseId: productId, classId },
+    });
+  }
+
+  /** Guarda el segundo actual de la clase (el backend ignora el 0). */
+  saveClassTime(productId: number, classId: number, seconds: number): Observable<unknown> {
+    return this.http.patch(`${this.baseUrl}/purchased/save-time`, null, {
+      params: { course_id: productId, class_id: classId, display_time: seconds },
+    });
+  }
+
+  /**
+   * Igual que saveClassTime pero pensado para el cierre de pestaña: `keepalive`
+   * deja que la petición termine aunque la página se descargue. Es "best effort".
+   */
+  saveClassTimeOnExit(productId: number, classId: number, seconds: number, token: string): void {
+    try {
+      const qs = new URLSearchParams({
+        course_id: String(productId),
+        class_id: String(classId),
+        display_time: String(seconds),
+      });
+      fetch(`${this.baseUrl}/purchased/save-time?${qs.toString()}`, {
+        method: 'PATCH',
+        keepalive: true,
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => undefined);
+    } catch {
+      // sin soporte de fetch/keepalive: no pasa nada, ya se guardó en pausas y cada 20 s
+    }
+  }
+
+  getClassResources(classSlug: string): Observable<ClassResource[]> {
+    return this.http.get<ClassResource[]>(
+      `${this.baseUrl}/course/class/resources/${encodeURIComponent(classSlug)}/list`
+    );
+  }
+
+  /** Descarga el archivo de un recurso (requiere el token, por eso va por HttpClient y no por un <a href>). */
+  downloadClassResource(resourceId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/course/class/resources/${resourceId}/download`, {
+      responseType: 'blob',
+    });
+  }
+
+  getClassLinks(productSlug: string, classSlug: string): Observable<ClassLinksResponse | null> {
+    return this.http.get<ClassLinksResponse | null>(
+      `${this.baseUrl}/course/class/get-links/${encodeURIComponent(productSlug)}/${encodeURIComponent(classSlug)}`
+    );
   }
 
   /** Lista de exámenes (curso, módulos y clases) de un curso comprado, con estado de avance del alumno. */
