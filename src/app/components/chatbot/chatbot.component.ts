@@ -5,9 +5,12 @@ import {
   AfterViewChecked,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ContentService } from '../../core/content.service';
 import { ChatOption } from '../../core/models';
+import { environment } from '../../../environments/environment';
 
 interface ChatMessage {
   from: 'bot' | 'user';
@@ -17,7 +20,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './chatbot.component.html',
   styleUrl: './chatbot.component.css',
 })
@@ -30,10 +33,19 @@ export class ChatbotComponent implements AfterViewChecked {
   currentOptions: ChatOption[] = [];
   isTyping = false;
 
+  // Texto que el visitante escribe en el campo libre
+  draft = '';
+
   private currentStepId = 'inicio';
   private shouldScroll = false;
+  // Identifica la conversación en n8n (cada visitante tiene su propia memoria)
+  private sessionId = crypto.randomUUID();
 
-  constructor(public content: ContentService, private router: Router) {
+  constructor(
+    public content: ContentService,
+    private router: Router,
+    private http: HttpClient
+  ) {
     this.loadStep(this.currentStepId, false);
   }
 
@@ -76,8 +88,50 @@ export class ChatbotComponent implements AfterViewChecked {
     }
   }
 
+  /** Envía el texto libre del visitante al workflow de n8n y muestra la respuesta. */
+  sendFree(): void {
+    const text = this.draft.trim();
+    if (!text || this.isTyping) return;
+
+    this.draft = '';
+    this.messages.push({ from: 'user', text });
+    this.currentOptions = [];
+    this.isTyping = true;
+    this.shouldScroll = true;
+
+    this.http
+      .post<{ output: string }>(environment.chatWebhookUrl, {
+        sessionId: this.sessionId,
+        message: text,
+      })
+      .subscribe({
+        next: (res) => {
+          this.isTyping = false;
+          this.messages.push({ from: 'bot', text: res.output });
+          this.currentOptions = [
+            { label: '⬅️ Volver al inicio', next: 'inicio' },
+          ];
+          this.shouldScroll = true;
+        },
+        error: () => {
+          this.isTyping = false;
+          this.messages.push({
+            from: 'bot',
+            text: 'Ups, tuve un problema. Puedes escribirnos por WhatsApp 📲',
+          });
+          this.currentOptions = [
+            { label: '💬 Hablar por WhatsApp', action: 'whatsapp' },
+            { label: '⬅️ Volver al inicio', next: 'inicio' },
+          ];
+          this.shouldScroll = true;
+        },
+      });
+  }
+
   restart(): void {
     this.messages = [];
+    // Nueva sesión = el bot olvida la conversación anterior
+    this.sessionId = crypto.randomUUID();
     this.loadStep('inicio', false);
   }
 
@@ -142,7 +196,7 @@ export class ChatbotComponent implements AfterViewChecked {
     this.shouldScroll = true;
   }
 
- private scrollToSection(id: string): void {
+  private scrollToSection(id: string): void {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
