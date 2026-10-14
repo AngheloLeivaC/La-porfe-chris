@@ -1,5 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, map, tap } from 'rxjs';
 import { CrmApiService } from './crm-api.service';
 import { AuthUser } from './models';
@@ -18,7 +20,7 @@ export class AuthService {
   readonly currentRole = signal<string | null>(null);
   readonly isAuthenticated = signal<boolean>(false);
 
-  constructor(private crmApi: CrmApiService, private router: Router) {
+  constructor(private crmApi: CrmApiService, private router: Router, private http: HttpClient) {
     this.restoreSession();
   }
 
@@ -60,6 +62,24 @@ export class AuthService {
       }),
       map((response) => response.data.user)
     );
+  }
+
+  /** Login automático desde el panel admin (botón "Ver aula"). */
+  loginRedirect(email: string, password: string): Observable<AuthUser> {
+    return this.http
+      .post<any>(`${environment.apiBaseUrl}/public/auth/login/redirect`, { email, password })
+      .pipe(
+        tap((response) => {
+          const { access_token, user, role } = response.data;
+          localStorage.setItem(STORAGE_KEYS.token, access_token);
+          localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+          localStorage.setItem(STORAGE_KEYS.role, role);
+          this.currentUser.set(user);
+          this.currentRole.set(role);
+          this.isAuthenticated.set(true);
+        }),
+        map((response) => response.data.user)
+      );
   }
 
   logout(): void {

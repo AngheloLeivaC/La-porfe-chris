@@ -6,6 +6,7 @@ import { RecoverPasswordComponent } from './pages/recover-password/recover-passw
 import { AulaVirtualComponent } from './pages/aula-virtual/aula-virtual.component';
 import { ExamRunnerComponent } from './pages/exam-runner/exam-runner.component';
 import { CoursePlayerComponent } from './pages/course-player/course-player.component';
+import { RedirectComponent } from './pages/redirect/redirect.component';
 import { authGuard } from './core/auth.guard';
 
 /**
@@ -31,6 +32,7 @@ export function coursePlayerMatcher(segments: UrlSegment[]): UrlMatchResult | nu
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'curso/:idioma/:slug', component: CourseDetailComponent },
+  { path: 'redirect/:data', component: RedirectComponent },
   { path: 'login', component: LoginComponent },
   { path: 'recuperar-contrasena', component: RecoverPasswordComponent },
   { matcher: coursePlayerMatcher, component: CoursePlayerComponent, canActivate: [authGuard] },
