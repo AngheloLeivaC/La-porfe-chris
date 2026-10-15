@@ -35,7 +35,7 @@ export class CourseDetailComponent implements OnInit {
   videoPlaying = false;
   openModuleIndex: number | null = 0;
   showEnrollmentModal = false;
-
+  private autoBuy = false;
   // ---- Flujo de compra: registro -> pago (mismo que en la landing) ----
   readonly buyingCourse = signal<Course | null>(null);
   readonly pendingRegistration = signal<PendingRegistration | null>(null);
@@ -48,8 +48,9 @@ export class CourseDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+        this.route.paramMap.subscribe((params) => {
       const slug = params.get('slug') ?? '';
+      this.autoBuy = this.route.snapshot.queryParamMap.get('comprar') === '1';
 
       this.notFound = false;
       this.course = undefined;
@@ -62,9 +63,13 @@ export class CourseDetailComponent implements OnInit {
       // recargas directas de página (F5) y dependía de un bug del backend
       // en /course/list que no traía 'categoria'.
       this.content.loadCourseBySlug(slug).subscribe({
-        next: (course: Course) => {
+                next: (course: Course) => {
           this.course = course;
           this.loadingDetail = false;
+          if (this.autoBuy) {
+            this.autoBuy = false;
+            this.comprar();
+          }
         },
         error: () => {
           this.notFound = true;

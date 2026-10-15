@@ -25,9 +25,7 @@
     </div>
 
     <div class="chat-body">
-      <div class="chat-bubble" [ngClass]="m.from" *ngFor="let m of messages">
-        {{ m.text }}
-      </div>
+            <div class="chat-bubble" [ngClass]="m.from" *ngFor="let m of messages" [innerHTML]="format(m.text)"></div>
 
       <div class="chat-bubble bot typing" *ngIf="isTyping">
         <span class="dot"></span>

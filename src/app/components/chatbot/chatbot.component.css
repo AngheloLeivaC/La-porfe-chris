@@ -306,3 +306,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+.chat-bubble a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+  word-break: break-all;
+}
